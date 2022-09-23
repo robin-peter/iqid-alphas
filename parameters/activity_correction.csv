@@ -1,0 +1,17 @@
+Study,Method,% Activity Difference
+H695-1,affine,0
+H695-2,affine,0
+H700-1,rigid body,0.38
+H700-2,rigid body,1.01
+H707-1,rigid body,0.35
+H707-2,rigid body,0.26
+H714-2,rigid body,3.96
+H714-2,rigid body,4.23
+H719-1,rigid body,0.77
+H719-2,rigid body,5.57
+H741-1,exclude,0
+H741-2,exclude,0
+H751-1,scaled rot,-10.46
+H764-1,rigid body,0.62
+H765-1,rigid body,1.21
+H765-2,rigid body,1.4
