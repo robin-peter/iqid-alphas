@@ -1,0 +1,4 @@
+data/**/**/*
+!.gitkeep
+create_gitkeeps.ipynb
+.ipynb_checkpoints
