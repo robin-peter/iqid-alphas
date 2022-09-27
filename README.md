@@ -45,8 +45,8 @@ iqid-alphas/ (main project directory)
   - demo_notebooks/ (demo Jupyter notebook tutorials)
     - Please use these as templates for your own analysis if you like.
     - Please explore the rest of the source code, as not everything is represented by the tutorials.
-    - No demo is currently available for the iqid (preprocessing) module, as the data that was published 
-      in the Scientific Reports manuscript used a legacy data format. Authors are working to update this for modern iQID devices.
+    - No demo is currently available for the iqid.process (preprocessing) module, as the data that was published 
+      in the Scientific Reports manuscript used a legacy iQID data format. Authors are working to update this for modern iQID devices.
     - **Important note** each notebook starts with "cd .." to move the working directory up a level to access the source files.
       This MUST be run in order to import the iQID source code from iqid/ unless you move the .py or .ipynb files.
       I opted for this solution to avoid adding the iQID package to your system or Python path.
