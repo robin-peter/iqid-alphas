@@ -1,6 +1,6 @@
 Study,Method,% Activity Difference
-H695-1,affine,0
-H695-2,affine,0
+H695-1,rigid body,5.4
+H695-2,rigid body,-0.07
 H700-1,rigid body,0.38
 H700-2,rigid body,1.01
 H707-1,rigid body,0.35
