@@ -181,82 +181,6 @@ def coarse_stack(unreg, deg=2, avg_over=1):
     return(reg)
 
 
-def decompose_affine(A):
-    """Decompose a 3x3 transformation matrix A into its affine constituents.
-
-    Affine: translation (T), rotation (R), scaling (Z), and shear (S). From
-    https://github.com/matthew-brett/transforms3d/blob/master/transforms3d/affines.py
-    """
-
-    A = np.asarray(A)
-    T = A[:-1,-1]
-    RZS = A[:-1,:-1]
-    ZS = np.linalg.cholesky(np.dot(RZS.T,RZS)).T
-    Z = np.diag(ZS).copy()
-    shears = ZS / Z[:,np.newaxis]
-    n = len(Z)
-    S = shears[np.triu(np.ones((n,n)), 1).astype(bool)]
-    R = np.dot(RZS, np.linalg.inv(ZS))
-    if np.linalg.det(R) < 0:
-        Z[0] *= -1
-        ZS[0] *= -1
-        R = np.dot(RZS, np.linalg.inv(ZS))
-    return T, R, Z, S
-
-
-def get_distortion_values(tmat):
-    """Quantify the distortion imposed on images by a matrix transformation.
-
-    To be used with the transformation matrix **stack** yielded by pystackreg
-    function register_stack().
-
-    Parameters
-    ----------
-    tmat : 3D array-like, shape (N, X, Y)
-        A stack of unregistered images of same shape, e.g. from either
-        assemble_stack() or ignore_images()
-
-    Returns
-    -------
-    Ss : 1D array-like, shape (N,)
-        Array of shear coefficients (no shear = 0)
-
-    Zs : 2D array-like, shape (N, 2)
-        Array of zoom (scaling) coefficients along x and y (no scaling = 1)
-    """
-
-    Ss = np.zeros(len(tmat))
-    Zs = np.zeros((len(tmat), 2))
-    for i in range(len(tmat)):
-        T, R, Z, S = decompose_affine(tmat[i])
-        Ss[i] = S
-        Zs[i] = Z
-    return(Ss, Zs)
-
-
-# Several helpful visualization functions from PyStackReg documentation
-# https://pystackreg.readthedocs.io/en/latest/
-
-def overlay_images(imgs, equalize=False, aggregator=np.mean):
-    '''Overlay two images to display alignment.'''
-    if equalize:
-        imgs = [exposure.equalize_hist(img) for img in imgs]
-
-    imgs = np.stack(imgs, axis=0)
-    return aggregator(imgs, axis=0)
-
-
-def composite_images(imgs, equalize=False, aggregator=np.mean):
-    '''Overlay two images, using colors to show alignment and misalignment.'''
-    if equalize:
-        imgs = [exposure.equalize_hist(img) for img in imgs]
-    imgs = [img / img.max() for img in imgs]
-    if len(imgs) < 3:
-        imgs += [np.zeros(shape=imgs[0].shape)] * (3-len(imgs))
-    imgs = np.dstack(imgs)
-    return imgs
-
-
 def format_circle(h, k, r, numpoints=400):
     '''Initialize a circle enclosing the ROI to start the contour.
 
@@ -389,3 +313,26 @@ def crop_down(rgb_overlay, rgb_ref):
                          (int(dheight/2)+dheight%2, int(dheight/2)),
                          (0,0)))
     return(cropped_ol)
+
+    
+# Several helpful visualization functions from PyStackReg documentation
+# https://pystackreg.readthedocs.io/en/latest/
+
+def overlay_images(imgs, equalize=False, aggregator=np.mean):
+    '''Overlay two images to display alignment.'''
+    if equalize:
+        imgs = [exposure.equalize_hist(img) for img in imgs]
+
+    imgs = np.stack(imgs, axis=0)
+    return aggregator(imgs, axis=0)
+
+
+def composite_images(imgs, equalize=False, aggregator=np.mean):
+    '''Overlay two images, using colors to show alignment and misalignment.'''
+    if equalize:
+        imgs = [exposure.equalize_hist(img) for img in imgs]
+    imgs = [img / img.max() for img in imgs]
+    if len(imgs) < 3:
+        imgs += [np.zeros(shape=imgs[0].shape)] * (3-len(imgs))
+    imgs = np.dstack(imgs)
+    return imgs

@@ -1,0 +1,14 @@
+We have copied the license statement from the authors of PyStackReg (https://pystackreg.readthedocs.io/en/latest/readme.html#license) as we felt it summarized the usage requirements well:
+
+You are free to use this software for commercial and non-commercial
+purposes. However, we expect you to include a citation or acknowledgement
+whenever you present or publish research results that are based
+on this software. You are free to modify this software or derive
+works from it, but you are only allowed to distribute it under the
+same terms as this license specifies. Additionally, you must include
+a reference to the research paper below in all software and works
+derived from this software.
+
+(DOI link to paper will be shown here when published)
+
+We would also like to mention the CRAPL, a self-described "academic-strength open source license" (https://matt.might.net/articles/crapl/), as a brief read which says nothing about the users' legal obligations but captures the spirit of this unpolished, academic code pipeline built on many Python packages developed by others.

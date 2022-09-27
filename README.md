@@ -17,7 +17,7 @@ Required:
 - opencv / cv2 (4.0.1)
 - skimage (0.18.1)
 - scipy (1.6.2)
-- PyStackReg (0.2.5)
+- PyStackReg (0.2.5) (https://github.com/glichtner/pystackreg)
 
 Recommended for visualization and Jupyter notebook demos:
 - Jupyter (4.7.1) notebook (6.4.0) or lab (3.0.14)
@@ -25,10 +25,10 @@ Recommended for visualization and Jupyter notebook demos:
 
 ## Installation
 To install the iQID processing functions:
-    1) clone git repo
-    2) python check_dependencies.py to check for the required Python packages.
-    2.5) (optional) run the demo notebooks to get a sense of the workflow.
-    3) import functions from iqid.process, iqid.dpk, or iqid.align as needed in your scripts.
+    1. clone git repo
+    2. python check_dependencies.py to check for the required Python packages.
+    3. (optional) run the demo notebooks to get a sense of the workflow.
+    4. import functions from iqid.process, iqid.dpk, or iqid.align as needed in your scripts.
 
 **Important note** Please mind the file structure if you are running the demo notebooks. See below.
 
