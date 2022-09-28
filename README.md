@@ -3,6 +3,10 @@ A Python-based framework for listmode data processing, image processing, and
 dosimetry using the iQID camera digital autoradiograph, as described in the
 paper published here: **(doi to be included)**.
 
+The permanent DOI of this repository is:
+
+[![DOI](https://zenodo.org/badge/540307496.svg)](https://zenodo.org/badge/latestdoi/540307496)
+
 Author: Robin Peter
 
 iQID camera expert: Brian Miller
