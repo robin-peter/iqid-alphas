@@ -1,7 +1,7 @@
 # iqid-alphas
 A Python-based framework for listmode data processing, image processing, and 
 dosimetry using the iQID camera digital autoradiograph, as described in the
-paper published here: **(doi to be included)**.
+paper published here: https://doi.org/10.1038/s41598-022-22664-5.
 
 The permanent DOI of this repository is:
 
