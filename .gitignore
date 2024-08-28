@@ -1,4 +1,4 @@
-data/**/**/*
+data_sample
 !.gitkeep
 create_gitkeeps.ipynb
 .ipynb_checkpoints
