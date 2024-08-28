@@ -1,9 +1,11 @@
+**08-28-2024:** updates are being made to the main branch over the next month. Please stay tuned.
+
 # iqid-alphas
 A Python-based framework for listmode data processing, image processing, and 
 dosimetry using the iQID camera digital autoradiograph, as described in the
 paper published here: https://doi.org/10.1038/s41598-022-22664-5.
 
-The permanent DOI of this repository is:
+The permanent DOI of the initial repository release is:
 
 [![DOI](https://zenodo.org/badge/540307496.svg)](https://zenodo.org/badge/latestdoi/540307496)
 
@@ -12,6 +14,12 @@ Author: Robin Peter
 iQID camera expert: Brian Miller
 
 Please contact the authors with any questions or for access to data samples.
+
+## Branches
+- **main**: the most up-to-date (but not backwards compatible) stable branch of the repo.
+- **2022-sci-rep**: the initial stable repository released alongside the 2022 publication in Scientific Reports.
+
+Any updates will be made to the main branch.
 
 ## Python Dependencies
 Please run script "check_dependencies.py" to check these against your versions.
@@ -36,8 +44,8 @@ To install the iQID processing functions:
 
 **Important note** Please mind the file structure if you are running the demo notebooks. See below.
 
-## Repository Structure
-Below is a description of the current files in the main (stable) branch of the iqid-alphas repo.
+## Repository Structure (2022-sci-rep)
+Below is a description of the files in the 2022-sci-rep branch of the iqid-alphas repo.
 
 iqid-alphas/ (main project directory)
   - check_dependencies.py   - setup script for checking Python dependencies. 
