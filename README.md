@@ -21,7 +21,6 @@ Please contact the authors with any questions or for access to data samples.
 
 Any updates will be made to the main branch.
 
-# Branch: 2022-sci-rep
 ## Python Dependencies
 Please run script "check_dependencies.py" to check these against your versions.
 
@@ -52,26 +51,21 @@ iqid-alphas/ (main project directory)
   - check_dependencies.py   - setup script for checking Python dependencies. 
                               See Installation section above.
   - iqid/ (Python source code)
-    - process.py (processing iQID listmode data)
+    - process_object.py (processing iQID listmode data)
     - align.py (alignment and registration)
     - dpk.py (dose kernel and DPK convolution)
+    - helper.py (miscellaneous helper functions for plotting, calculations, etc)
+    - spec.py (gamma spectroscopy)
   - demo_notebooks/ (demo Jupyter notebook tutorials)
     - Please use these as templates for your own analysis if you like.
     - Please explore the rest of the source code, as not everything is represented by the tutorials.
-    - No demo is currently available for the iqid.process (preprocessing) module, as the data that was published 
-      in the Scientific Reports manuscript used a legacy iQID data format. Authors are working to update this for modern iQID devices.
     - **Important note** each notebook starts with "cd .." to move the working directory up a level to access the source files.
       This MUST be run in order to import the iQID source code from iqid/ unless you move the .py or .ipynb files.
       I opted for this solution to avoid adding the iQID package to your system or Python path.
       However, for more permanent setup, please see discussion on the following thread:
       https://stackoverflow.com/questions/34478398/import-local-function-from-a-module-housed-in-another-directory-with-relative-im
-  - parameters/ (shareable data files)
-    - at211_10E6_151_1um_water.txt  (DPK for At-211 simulated in GEANT4 using $10^7$ alpha particles in water.)
-    - scale_data.csv (Spreadsheet containing iQID and H&E scale information for all studies.)
-    - activity_correction.csv (Spreadsheet containing small correction values introduced by transformations.)
-  - data/ (NOT PUBLIC: canine lymph node iQID data from Fred Hutchinson)
-    - For data security reasons, these are not currently uploaded to the repository.
-    - However, until they are, you should be able to see the file structure of the folders.
+  - data_sample/ (sample data used in the demo notebooks)
+    - Due to file size, these are not uploaded to the repository.
     - Additionally, select images are visible in the demo notebook previews. Please feel free to
       make one copy of the notebooks for viewing and another to experiment using your own data.
-    - Finally, please contact the authors if you would like to request access to the data.
+    - Please contact the authors if you would like to request access to the data.
