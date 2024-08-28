@@ -14,7 +14,7 @@ try:
     print('matplotlib: {} (3.3.4)'.format(matplotlib.__version__))
 
     # iQID packages
-    from iqid import process, align, dpk
+    from iqid import process_object, align, dpk
     print('All dependencies successfully located. Double-check versions if anything breaks.')
 except Exception as e:
     print('Missing dependency: ' + repr(e))

@@ -3,7 +3,7 @@ import numpy as np
 '''Functions for manipulating a dose kernel and performing DPK convolution with an iQID activity image stack.'''
 
 
-def load_kernel(filename, dim, num_alpha_decays):
+def load_txt_kernel(filename, dim, num_alpha_decays):
     """Loads .txt dose kernel into MeV/alpha/px np.array.
 
     File structure has 5 lines of header and cols (x, y, z, E).
@@ -27,11 +27,11 @@ def load_kernel(filename, dim, num_alpha_decays):
     """
 
     kernelData = np.genfromtxt(filename, delimiter=' ', skip_header=5)
-    E = kernelData[:,-1]
+    E = kernelData[:, -1]
     dims = (dim*np.ones(3)).astype(int)
     dose_kernel = E.reshape(dims[0], dims[1], dims[2])
     dose_kernel = dose_kernel/num_alpha_decays
-    return(dose_kernel)
+    return (dose_kernel)
 
 
 def mev_to_mgy(kernel, vox_vol_m, dens_kgm=1e3):
@@ -60,7 +60,7 @@ def mev_to_mgy(kernel, vox_vol_m, dens_kgm=1e3):
     mass_kg_px = dens_kgm * vox_vol_m
     gy_kernel = kernel * 1e6 * 1.6021e-19 / mass_kg_px
     mgy_kernel = gy_kernel * 1e3
-    return(mgy_kernel)
+    return (mgy_kernel)
 
 
 def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
@@ -88,7 +88,7 @@ def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
 
     if mode != 'whole' and mode != 'segment':
         print('Unsupported mode. Please select 3D "whole" or 1D "segment".')
-        return(None)
+        return (None)
 
     centerpt = len(kernel)//2
     a, b, c = kernel.shape
@@ -114,11 +114,11 @@ def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
         idx += 1
 
     if mode == 'whole':
-        return(kernel_avg_rad)
+        return (kernel_avg_rad)
     elif mode == 'segment':
-        return(segment_avg_rad)
+        return (segment_avg_rad)
     else:
-        return(None)
+        return (None)
 
 
 def pad_kernel_to_vsize(kernel, vox_xy, slice_z=12):
@@ -148,10 +148,15 @@ def pad_kernel_to_vsize(kernel, vox_xy, slice_z=12):
     xy = np.round(vox_xy)
     z = np.round(slice_z)
 
-    rem_xy = len(kernel) % xy
-    rem_z = len(kernel) % z
+    rem_xy = np.shape(kernel)[1] % xy
+    rem_z = np.shape(kernel)[0] % z
     pad_xy = int(xy - rem_xy)
     pad_z = int(z - rem_z)
+
+    if rem_xy == 0:
+        pad_xy = 0
+    if rem_z == 0:
+        pad_z = 0
 
     padded_kernel = np.pad(kernel,
                            ((pad_z//2, pad_z//2 + pad_z % 2),
@@ -159,4 +164,53 @@ def pad_kernel_to_vsize(kernel, vox_xy, slice_z=12):
                             (pad_xy//2, pad_xy//2 + pad_xy % 2)),
                            'constant')
 
-    return(padded_kernel)
+    return padded_kernel
+
+
+def get_pd(thalf, framerate):
+    """Get scalar correction factor to events missed in framerate
+    due to the fastest-decaying progeny radionuclide.
+
+    Parameters
+    ----------
+    thalf : float
+        Half-life of the fast-decaying progeny, in s
+
+    framerate : float
+        Frame-rate of device in frames per second (fps)
+
+
+    Returns
+    -------
+    pd : float in interval [0,1]
+        Probability of double-decay, given observed parent decay.
+
+    Derivation in accompanying manuscript.
+
+    """
+    lam = np.log(2)/thalf
+    t1 = 1 / framerate
+    p = 1 - 1/(lam*t1) * (1 - np.exp(-lam * t1))
+    return p
+
+
+def fr_corr_ac(framerate):
+    """Wrapper for the Ac-225 case.
+
+    Parameters
+    ----------
+    framerate : float
+        Frame-rate of device in frames per second (fps)
+
+    Returns
+    -------
+    out : float in interval [1,2]
+        Scalar correction to recorded counts.
+
+    """
+    thalf_at217 = 32.3 * 1e-3
+    pd = get_pd(thalf_at217, framerate)
+    pa = 0.25 * (1-pd)
+    pf = 0.25 / (0.25 + 0.25 + 0.25 + pa)
+    out = 1 + pd * pf
+    return out, pd, pf
