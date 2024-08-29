@@ -12,9 +12,7 @@ Please contact the authors with any questions or for access to data samples.
 - (2022, Sci Rep, initial methods): https://doi.org/10.1038/s41598-022-22664-5.
 - (2024, Sci Rep, 3D sub-organ dosimetry and TCP): https://doi.org/10.1038/s41598-024-70417-3
 
-The permanent DOI of the initial repository release in 2022 is:
-
-[![DOI](https://zenodo.org/badge/540307496.svg)](https://zenodo.org/badge/latestdoi/540307496)
+Permanent DOI of the initial repository release in 2022: [![DOI](https://zenodo.org/badge/540307496.svg)](https://zenodo.org/badge/latestdoi/540307496)
 
 
 ## Branches
