@@ -1,17 +1,21 @@
 # iqid-alphas
 A Python-based framework for listmode data processing, image processing, and 
-dosimetry using the iQID camera digital autoradiograph, as described in the
-paper published here: https://doi.org/10.1038/s41598-022-22664-5.
+dosimetry using the iQID camera digital autoradiograph.
 
-The permanent DOI of the initial repository release is:
-
-[![DOI](https://zenodo.org/badge/540307496.svg)](https://zenodo.org/badge/latestdoi/540307496)
-
-Author: Robin Peter
+Repository author: Robin Peter
 
 iQID camera expert: Brian Miller
 
 Please contact the authors with any questions or for access to data samples.
+
+## Papers:
+- (2022, Sci Rep, initial methods): https://doi.org/10.1038/s41598-022-22664-5.
+- (2024, Sci Rep, 3D sub-organ dosimetry and TCP): https://doi.org/10.1038/s41598-024-70417-3
+
+The permanent DOI of the initial repository release in 2022 is:
+
+[![DOI](https://zenodo.org/badge/540307496.svg)](https://zenodo.org/badge/latestdoi/540307496)
+
 
 ## Branches
 - **main**: the most up-to-date (but not backwards compatible) stable branch of the repo.
