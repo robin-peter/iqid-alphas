@@ -1,5 +1,3 @@
-**08-28-2024:** updates are being made to the main branch over the next month. Please stay tuned.
-
 # iqid-alphas
 A Python-based framework for listmode data processing, image processing, and 
 dosimetry using the iQID camera digital autoradiograph, as described in the
@@ -44,7 +42,7 @@ To install the iQID processing functions:
 
 **Important note** Please mind the file structure if you are running the demo notebooks. See below.
 
-## Repository Structure (2022-sci-rep)
+## Repository Structure
 Below is a description of the files in the 2022-sci-rep branch of the iqid-alphas repo.
 
 iqid-alphas/ (main project directory)
