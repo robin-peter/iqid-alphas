@@ -8,7 +8,7 @@ iQID camera expert: Brian Miller
 
 Please contact the authors with any questions or for access to data samples.
 
-## Papers:
+## Papers
 - (2022, Sci Rep, initial methods): https://doi.org/10.1038/s41598-022-22664-5.
 - (2024, Sci Rep, 3D sub-organ dosimetry and TCP): https://doi.org/10.1038/s41598-024-70417-3
 
