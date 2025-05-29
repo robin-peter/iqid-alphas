@@ -1,0 +1,39 @@
+{
+  "automate_processing": {
+    "file_name": "path/to/your/listmode_data.dat",
+    "output_dir": "path/to/save/processed_data",
+    "c_area_thresh": 15,
+    "makedir": false,
+    "ftype": "processed_lm",
+    "binfac": 1,
+    "ROI_area_thresh": 100,
+    "t_binsize": 1000,
+    "t_half": 3600,
+    "subpx": 1,
+    "event_fx": 0.1,
+    "xlim": [0, null],
+    "ylim": [0, null],
+    "gauss": 15,
+    "thresh": 0
+  },
+  "automate_image_alignment": {
+    "image_dir": "path/to/your/image_directory",
+    "output_dir": "path/to/save/registered_images",
+    "fformat": "tif",
+    "pad": false,
+    "deg": 2,
+    "avg_over": 1,
+    "subpx": 1,
+    "color": [0, 0, 0]
+  },
+  "automate_dose_kernel_processing": {
+    "kernel_file": "path/to/your/kernel_file.txt",
+    "dim": 128,
+    "num_alpha_decays": 1000000,
+    "vox_vol_m": 1e-9,
+    "dens_kgm": 1000,
+    "vox_xy": 1,
+    "slice_z": 12,
+    "output_dir": "path/to/save/processed_kernels"
+  }
+}
