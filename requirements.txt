@@ -1,0 +1,8 @@
+numpy
+matplotlib
+scikit-image
+scipy
+pystackreg
+tqdm
+h5py
+imagesize
