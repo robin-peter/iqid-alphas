@@ -5,18 +5,17 @@ import os
 import numpy as np
 import cv2
 import glob
+
 from scipy.optimize import curve_fit
-from skimage import io, transform
+from skimage import io, transform, filters
 import matplotlib.pyplot as plt
 import matplotlib.cm
-from matplotlib.colors import Normalize
 
+from datetime import datetime
 from tqdm import tqdm, trange
 
 import ipywidgets as widgets
 import functools
-
-from pathlib import Path
 
 from iqid import helper
 
@@ -40,7 +39,7 @@ class ClusterData:
         self.c_area_thresh = c_area_thresh
 
         if makedir:
-            Path(self.savedir).mkdir(parents=True, exist_ok=True)
+            os.makedirs(self.savedir, exist_ok=True)
 
     def init_header(self):
         HEADER = np.fromfile(self.file_name, dtype=np.int32, count=100)
@@ -71,6 +70,30 @@ class ClusterData:
         self.t_half = t_half
         return ()
 
+    def parse_acqt(self):
+        self.info_file = helper.natural_sort(
+            glob.glob(
+                os.path.join(
+                    os.path.dirname(
+                        os.path.dirname(self.file_name)),
+                    "*Acquisition_Info*.txt")))[-2]
+
+        with open(self.info_file, "r") as file:
+            lines = file.readlines()[:2]
+            # Format: "Date: Weekday, Month XX, 20XX"
+            date_string = lines[0].rstrip('\n')
+            time_string = lines[1].rstrip('\n')  # Format: "Time: XX:YY:ZZ AM"
+
+        date_string = date_string[6:]
+        time_string = time_string[6:]  # XX:YY:ZZ AM
+        combined_string = date_string + ',' + time_string
+        time_format = "%A, %B %d, %Y,%I:%M:%S %p"
+
+        datetime_result = datetime.strptime(combined_string, time_format)
+        self.acq_time = datetime_result
+
+        return datetime_result
+
     def load_cluster_data(self, event_fx=1, dtype=np.float64):
         self.init_header()
         file_size_bytes = os.path.getsize(self.file_name)
@@ -99,7 +122,7 @@ class ClusterData:
         # find associated raw listmode file in folder if there is one
         # ensure that there is only one in the directory, or it could grab the wrong one
         rlistmode = glob.glob(os.path.join(
-            self.file_name, '..', '*Cropped_Raw_Listmode.dat'))
+            os.path.dirname(self.file_name), '*Cropped_Raw_Listmode.dat'))
 
         if not rlistmode:
             raise Exception(
@@ -146,6 +169,8 @@ class ClusterData:
             kurt_x = data[13, :]
 
             self.cluster_area = cluster_area
+            self.cluster_sum = sum_cluster_signal
+
             self.xC = xC_global
             self.yC = yC_global
             self.f = frame_num
@@ -191,23 +216,29 @@ class ClusterData:
             # Time elapsed since start of acquisition (size Unsigned INT)
             time_ms = data[2*a**2 + 6, :]
             # Number of pixels (area) in the cluster (size INT)
-            cim_px = data[2*a**2 + 7, :]
+            cluster_area = data[2*a**2 + 7, :]
 
             self.xC = xC
             self.yC = yC
             self.f = frame_num
             self.cim_sum = cim_sum
-            self.cim_px = cim_px
+            self.cluster_area = cluster_area
+            self.cluster_sum = sum_cluster_signal
             self.raws = raw_imgs
             self.time_ms = time_ms
 
-            return frame_num, time_ms, xC, yC, raw_imgs, cim_sum, cim_px
+            return frame_num, time_ms, xC, yC, raw_imgs, cim_sum, cluster_area
 
         else:
             print('Accepted types: process_lm, offset_lm, clusters')
 
+    def image(self):
+        cim = np.zeros((int(self.YDIM), int(self.XDIM)))
+        for i in trange(len(self.xC), desc='Building image...'):
+            cim[self.yC[i].astype(int), self.xC[i].astype(int)] += 1
+        return cim
+
     def image_from_xy(self, x, y):
-        # original spatial image
         x = np.round(x)
         y = np.round(y)
 
@@ -323,10 +354,15 @@ class ClusterData:
         subset_data.yC = self.yC[selection_bool]
         subset_data.f = self.f[selection_bool]
         subset_data.time_ms = self.time_ms[selection_bool]
+        subset_data.cluster_area = self.cluster_area[selection_bool]
+        subset_data.cluster_sum = self.cluster_sum[selection_bool]
+
         if self.ftype == 'clusters':
             subset_data.raws = self.raws[selection_bool]
             subset_data.cim_sum = self.cim_sum[selection_bool]
-            subset_data.cim_px = self.cim_px[selection_bool]
+            subset_data.cluster_area = self.cluster_area[selection_bool]
+            subset_data.cluster_imsize = self.cluster_imsize
+            subset_data.cluster_sum = self.cluster_sum[selection_bool]
 
         return subset_data
 
@@ -349,17 +385,25 @@ class ClusterData:
         else:
             print('Offset file not loaded. TODO implement fallback using LM file.')
 
-    def estimate_missed_timestamps(self):
+    def estimate_missed_timestamps(self, verbose=True):
         # estimate the approximate timestamp of missed frames using offset file
         # this allows for correction in the time histogram for activity quantification
         # do not use this for rigorous timing coincidence
+        # Just does 1 event per frame - should check the n-value to see if accurate
+
+        if verbose:
+            def iter_fn(integer):
+                return trange(integer, desc="Estimating missed timestamps")
+        else:
+            iter_fn = range
+
         if self.miss is not None:
             m = self.miss
             t = self.offset_frame_time
 
             num_new_missed = np.diff(m)
             missed_events_time = np.array([])
-            for i in range(len(num_new_missed)):
+            for i in iter_fn(len(num_new_missed)):
                 if num_new_missed[i] > 0:
                     missed_events_time = np.append(missed_events_time,
                                                    np.repeat(t[i], num_new_missed[i]))
@@ -367,7 +411,7 @@ class ClusterData:
         else:
             print('Offset file not loaded. TODO implement fallback using LM file.')
 
-    def filter_singles(self, fmax, vis=False):
+    def filter_singles(self, fmax, vis=False, save=False, filter_time=False):
         vals, N = np.unique(self.f, return_counts=True)
         single_fnums = vals[N == 1]
 
@@ -390,7 +434,12 @@ class ClusterData:
         self.xC = self.xC[cluster_bool].astype(int)
         self.yC = self.yC[cluster_bool].astype(int)
         self.f = self.f[cluster_bool]
-        return (self.xC, self.yC, self.f)
+
+        if filter_time:
+            self.time_ms = self.time_ms[cluster_bool]
+            self.cluster_area = self.cluster_area[cluster_bool]
+
+        return (self.xC, self.yC, self.f, self.time_ms)
 
     def set_coin_params(self, fps, t0_dt, TS_ROI, binfac=1, verbose=True):
         # TS_ROI: external from IDM data, code this in later
@@ -540,6 +589,46 @@ class ClusterData:
         self.f = corr_lm  # overwrites listmode frames in place, be careful to save separate variable if needed for some reason
         return corr_lm
 
+    def get_coms(self):
+        '''
+        Get center of mass (CoM) of a cluster image.
+        Uses Otsu threshold to binarize the pixel image before evaluating CoM.
+        '''
+        if self.ftype != 'clusters':
+            raise TypeError(
+                "Data set is not of type 'cluster': {}".format(self.ftype))
+
+        coms = np.zeros((len(self.raws), 2))
+        for i in trange(len(self.raws), desc='Finding CoMs...'):
+            im = self.raws[i].reshape(self.cluster_imsize, self.cluster_imsize)
+            thresh = filters.threshold_otsu(im)
+            bin_im = (im > thresh).astype(int)
+            cx, cy = helper.com(bin_im)
+            coms[i, :] = cx, cy
+
+        self.coms = coms
+        return coms
+
+    def filter_coms(self, size=7):
+        '''
+        Discard events for which the center of mass is outside of a certain centered region.
+        Only applicable to cluster data set.
+        Size parameter determines size of the internal square boundary for CoM discrimination.
+        '''
+
+        if self.ftype != 'clusters':
+            raise TypeError(
+                "Data set is not of type 'cluster': {}".format(self.ftype))
+
+        coms = self.get_coms()
+
+        x0 = self.cluster_imsize//2 - size//2
+        good_coms = (coms[:, 0] > x0) * (coms[:, 0] < x0 + size) * \
+            (coms[:, 1] > x0) * (coms[:, 1] < x0 + size)
+
+        self.com_bool = good_coms  # can be used for debugging
+        return self.get_subset(good_coms)
+
     def set_contour_params(self, gauss=15, thresh=0):
         self.gauss = gauss
         self.thresh = thresh
@@ -610,13 +699,18 @@ class ClusterData:
             self.contours = self.get_contours(im)
         elif mode == 'manual':
             self.contours = self.get_contours_from_dir(**kwargs)
+        elif mode == 'single':
+            pass  # make this provide one single ROI that is just the whole image
         else:
-            raise TypeError('Mode must be "auto" or "manual".')
+            raise TypeError('Mode must be "auto", "manual", or "single".')
         self.maskstack = self.get_maskstack(im)
         self.ROIbool = self.events_in_ROI(self.maskstack)
         self.ROIlists = self.get_ROIs()
 
-    def fitHist(self, t, n, func=exponential, p0=[1, 9.92*24*3600], tol=0.05):
+    def fitHist(self, t, n, func=exponential, p0=None, tol=0.05):
+        if p0 is None:
+            p0 = [1, self.t_half]
+            # changed from default p0= [1, 9.92*24*3600] for Ac-225
         thalf = p0[1]
         popt, pcov = curve_fit(f=func, xdata=t, ydata=n,
                                p0=p0, sigma=np.maximum(
@@ -699,7 +793,7 @@ class ClusterData:
     def save_manual_mask(self, mask):
         # base = os.path.basename(os.path.normpath(self.file_name))
         # newdir = os.path.join(self.file_name, '..', base[:-4] + '_Analysis')
-        Path(self.savedir).mkdir(parents=True, exist_ok=True)
+        os.makedirs(self.savedir, exist_ok=True)
         plt.imsave(os.path.join(self.savedir, 'manual_mask_preview.png'), mask)
         io.imsave(os.path.join(self.savedir, 'manual_mask.tif'),
                   mask, plugin='tifffile')
@@ -723,14 +817,14 @@ class ClusterData:
             f, ax = plt.subplots(nrows=len(iterlist), ncols=2,
                                  figsize=(8, 4*len(iterlist)))
             if save:
-                Path(self.savedir).mkdir(parents=True, exist_ok=True)
+                os.makedirs(self.savedir, exist_ok=True)
                 pvdir = os.path.join(self.savedir, 'mBq_image_previews')
-                Path(pvdir).mkdir(parents=True, exist_ok=True)
+                os.makedirs(pvdir, exist_ok=True)
 
         if save:
-            Path(self.savedir).mkdir(parents=True, exist_ok=True)
+            os.makedirs(self.savedir, exist_ok=True)
             imdir = os.path.join(self.savedir, 'mBq_images')
-            Path(imdir).mkdir(parents=True, exist_ok=True)
+            os.makedirs(imdir, exist_ok=True)
 
         all_A0 = np.zeros(len(iterlist))
         all_dA0 = np.zeros(len(iterlist))
@@ -746,9 +840,9 @@ class ClusterData:
                                                                  tol=tol)
 
             if save_ts:
-                Path(self.savedir).mkdir(parents=True, exist_ok=True)
+                os.makedirs(self.savedir, exist_ok=True)
                 newdir = os.path.join(self.savedir, 'ROI_tstamps')
-                Path(newdir).mkdir(parents=True, exist_ok=True)
+                os.makedirs(newdir, exist_ok=True)
                 np.savetxt(os.path.join(
                     newdir, 'tstamps_{}.txt'.format(i)), t_data)
 
@@ -831,13 +925,13 @@ class ClusterData:
         if savemasks:
             base = os.path.basename(os.path.normpath(self.file_name))
             maskdir = os.path.join(self.savedir, 'full_masks')
-            Path(maskdir).mkdir(parents=True, exist_ok=True)
+            os.makedirs(maskdir, exist_ok=True)
             for i in range(len(iterlist)):
                 io.imsave(os.path.join(maskdir, 'mask_{}.png'.format(i)),
                           (255*self.maskstack[iterlist[i], :, :]).astype(np.uint8), check_contrast=False)
 
             maskdir = os.path.join(self.savedir, 'ROI_masks')
-            Path(maskdir).mkdir(parents=True, exist_ok=True)
+            os.makedirs(maskdir, exist_ok=True)
             for i in range(len(iterlist)):
                 x, y, w, h = self.ROIlists[iterlist[i], :]
                 mask = self.maskstack[iterlist[i], y:y+h, x:x+w]
