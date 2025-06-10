@@ -93,6 +93,24 @@ class ClusterData:
         self.acq_time = datetime_result
 
         return datetime_result
+    
+    def parse_framerate(self):
+        self.info_file = helper.natural_sort(
+            glob.glob(
+                os.path.join(
+                    os.path.dirname(
+                        os.path.dirname(self.file_name)),
+                    "*Acquisition_Info*.txt")))[-2]
+
+        with open(self.info_file, "r") as file:
+            lines = file.readlines()[4]
+            # Format: "Frame Rate (fps): XX.XX"
+            fps_string = lines.rstrip('\n')
+
+        fps_string = fps_string[18:]
+        self.fps = float(fps_string)
+
+        return self.fps
 
     def load_cluster_data(self, event_fx=1, dtype=np.float64):
         self.init_header()
