@@ -82,7 +82,7 @@ def display_available_samples(data_matcher, available_samples):
         print("📋 No samples available")
         return
     
-    print(f"\\n📋 Available Samples:")
+    print(f"\n📋 Available Samples:")
     print("     Sample       Tissue   Side   H&E Files   iQID Locations")
     print("     " + "-" * 55)
     
@@ -96,7 +96,7 @@ def display_available_samples(data_matcher, available_samples):
 
 def get_user_choice():
     """Get user's processing choice."""
-    print(f"\\n🔄 Processing Options:")
+    print(f"\n🔄 Processing Options:")
     print(f"   1. Process all samples (both iQID alignment & H&E co-registration)")
     print(f"   2. Process all samples (iQID alignment only)")
     print(f"   3. Select specific samples to process")
@@ -105,13 +105,13 @@ def get_user_choice():
     
     while True:
         try:
-            choice = input("\\nEnter your choice (1-5): ").strip()
+            choice = input("\nEnter your choice (1-5): ").strip()
             if choice in ['1', '2', '3', '4', '5']:
                 return choice
             else:
                 print("Please enter a number between 1 and 5")
         except KeyboardInterrupt:
-            print("\\n\\n❌ Interrupted by user")
+            print("\n\n❌ Interrupted by user")
             return '5'
 
 def show_sample_details(data_matcher, available_samples):
@@ -123,7 +123,7 @@ def show_sample_details(data_matcher, available_samples):
     display_available_samples(data_matcher, available_samples)
     
     try:
-        choice = input("\\nEnter sample number to view details (or 'back'): ").strip()
+        choice = input("\nEnter sample number to view details (or 'back'): ").strip()
         if choice.lower() == 'back':
             return
         
@@ -132,7 +132,7 @@ def show_sample_details(data_matcher, available_samples):
             sample_key = available_samples[sample_idx]
             sample_info = data_matcher.get_sample_info(sample_key)
             
-            print(f"\\n📋 Detailed Information for {sample_key}:")
+            print(f"\n📋 Detailed Information for {sample_key}:")
             print(f"   H&E Data:")
             he_info = sample_info['he']
             print(f"     - Sample ID: {he_info['sample_id']}")
@@ -143,7 +143,7 @@ def show_sample_details(data_matcher, available_samples):
             print(f"     - Path: {he_info['path']}")
             print(f"     - Files: {', '.join(he_info['files'][:5])}{'...' if len(he_info['files']) > 5 else ''}")
             
-            print(f"\\n   iQID Data:")
+            print(f"\n   iQID Data:")
             for location, iqid_info in sample_info['iqid'].items():
                 print(f"     {location.title()} Location:")
                 print(f"       - Sample ID: {iqid_info['sample_id']}")
@@ -190,7 +190,7 @@ def process_samples(data_matcher, sample_list, workflow_type="complete"):
         print("No samples to process")
         return
     
-    print(f"\\n🚀 Starting {workflow_type} workflow for {len(sample_list)} samples...")
+    print(f"\n🚀 Starting {workflow_type} workflow for {len(sample_list)} samples...")
     
     # Create output directories
     output_dirs = ["outputs/batch_processing", "intermediate/batch"]
@@ -206,7 +206,7 @@ def process_samples(data_matcher, sample_list, workflow_type="complete"):
     }
     
     for i, sample_key in enumerate(sample_list, 1):
-        print(f"\\n  Sample {i}/{len(sample_list)}: {sample_key}")
+        print(f"\n  Sample {i}/{len(sample_list)}: {sample_key}")
         
         try:
             if data_matcher:
@@ -237,7 +237,7 @@ def process_samples(data_matcher, sample_list, workflow_type="complete"):
     with open(results_path, 'w') as f:
         json.dump(results, f, indent=2)
     
-    print(f"\\n✅ Batch processing completed!")
+    print(f"\n✅ Batch processing completed!")
     print(f"📊 Results: {results['successful']} successful, {results['failed']} failed")
     print(f"📁 Results saved to: {results_path}")
 
@@ -274,7 +274,7 @@ def main():
             display_available_samples(data_matcher, available_samples)
             
             try:
-                selection = input("\\nEnter sample numbers (comma-separated, e.g., 1,3,5): ").strip()
+                selection = input("\nEnter sample numbers (comma-separated, e.g., 1,3,5): ").strip()
                 if not selection:
                     continue
                 
@@ -298,7 +298,7 @@ def main():
             
         elif choice == '5':
             # Exit
-            print("\\n👋 Goodbye!")
+            print("\n👋 Goodbye!")
             break
 
 if __name__ == "__main__":

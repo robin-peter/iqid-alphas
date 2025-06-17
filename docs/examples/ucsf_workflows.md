@@ -118,17 +118,6 @@ The consolidated workflow works with the actual UCSF data structure containing k
 
 **Important**: All UCSF data directories are READ-ONLY. The workflow only reads from these locations and stores all results in organized subdirectories within the workflow folder.
 
-### Legacy Example Data Structure (for Individual Workflows)
-```
-examples/ucsf_workflows/data/
-├── raw_iqid/                    # Raw iQID TIFF stacks
-│   ├── sample01_frame001.tif
-│   ├── sample01_frame002.tif
-│   └── ...
-└── he_histology/               # H&E histology images
-    ├── sample01_he.jpg
-    └── ...
-```
 
 ### Expected File Formats
 - **iQID Data:** TIFF files (`.tif`, `.tiff`)
@@ -242,22 +231,6 @@ examples/ucsf_consolidated/
 ├── logs/                           # Processing logs with timestamps
 └── reports/                        # Comprehensive JSON reports
     └── consolidated_workflow_results_*.json
-```
-
-### Individual Workflow Outputs (Legacy)
-```
-examples/ucsf_workflows/outputs/
-├── iqid_aligned/                    # Workflow 1 outputs
-│   ├── aligned_iqid_stack.npy     # Main aligned data
-│   ├── processing_report.json      # Alignment metrics
-│   └── visualizations/             # Quality plots
-├── he_iqid_analysis/               # Workflow 2 outputs
-│   ├── tissue_activity_data.csv    # Quantitative data
-│   ├── quantitative_analysis.json  # Complete analysis
-│   └── visualizations/             # Overlay images
-└── complete_analysis/              # Master pipeline outputs
-    ├── comprehensive_analysis_report.json
-    └── analysis_summary.txt
 ```
 
 ### Intermediate Files

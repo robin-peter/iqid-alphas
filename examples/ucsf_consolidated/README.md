@@ -167,6 +167,46 @@ The main configuration is in `configs/ucsf_data_config.json` and includes:
 
 ## 🚀 Usage
 
+### NEW: Batch Processing (Recommended)
+Process ALL available samples with comprehensive visualization and quality assessment:
+
+```bash
+cd examples/ucsf_consolidated
+
+# Process all samples with comprehensive visualizations
+python run_batch_processing.py
+
+# Quick demo with first 3 samples only
+python run_batch_processing.py --quick
+
+# Demo mode with mock data (for testing without real UCSF data)
+python run_batch_processing.py --demo
+
+# Process specific number of samples
+python run_batch_processing.py --samples 10
+
+# Enable verbose logging
+python run_batch_processing.py --verbose
+```
+
+**Batch Processing Features:**
+- 🔍 **Automatic Sample Discovery**: Finds all available UCSF samples
+- 📊 **Individual Sample Visualization**: Quality dashboard, alignment plots, activity maps
+- 📈 **Comprehensive Summary**: Batch overview, quality metrics, statistical analysis
+- 🎯 **Quality Assessment**: Alignment scores, registration quality, processing efficiency
+- 📁 **Organized Outputs**: Structured results with individual and summary visualizations
+
+**Generated Visualizations:**
+- Batch processing dashboard with overall statistics
+- Quality metrics summary and distribution analysis
+- Sample comparison radar charts
+- Processing performance analysis
+- Individual sample quality dashboards
+- Alignment quality over time plots
+- Activity distribution histograms
+
+### Individual Sample Processing (Original Workflow)
+
 ### Run Complete Workflow
 ```bash
 cd examples/ucsf_consolidated

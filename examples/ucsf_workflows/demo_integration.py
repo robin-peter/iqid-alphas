@@ -43,7 +43,7 @@ def demonstrate_data_discovery():
     
     try:
         # Initialize data matcher
-        print(f"\\n🔍 Initializing data matcher...")
+        print(f"\n🔍 Initializing data matcher...")
         data_matcher = UCSFDataMatcher(base_path)
         print(f"✅ Data matcher initialized successfully")
         
@@ -51,14 +51,14 @@ def demonstrate_data_discovery():
         available_samples = data_matcher.get_available_samples()
         summary = data_matcher.get_sample_summary()
         
-        print(f"\\n📊 Data Discovery Results:")
+        print(f"\n📊 Data Discovery Results:")
         print(f"   - Total matched samples: {summary['total_matched_samples']}")
         print(f"   - Kidney samples: {summary['samples_by_tissue']['kidney']}")
         print(f"   - Tumor samples: {summary['samples_by_tissue']['tumor']}")
         print(f"   - Left/Right distribution: {summary['samples_by_side']['L']}/{summary['samples_by_side']['R']}")
         print(f"   - Available iQID locations: {', '.join(summary['available_iqid_locations'])}")
         
-        print(f"\\n📋 Matched Samples:")
+        print(f"\n📋 Matched Samples:")
         print("     Sample ID    Tissue   Side   H&E Files   iQID Locations")
         print("     " + "-" * 60)
         
@@ -73,7 +73,7 @@ def demonstrate_data_discovery():
         # Demonstrate data loading for first sample
         if available_samples:
             demo_sample = available_samples[0]
-            print(f"\\n🔍 Data Loading Demonstration - Sample: {demo_sample}")
+            print(f"\n🔍 Data Loading Demonstration - Sample: {demo_sample}")
             
             # Load H&E data
             he_data = data_matcher.load_he_data(demo_sample)
@@ -108,8 +108,8 @@ def demonstrate_data_discovery():
 
 def demonstrate_workflow_capabilities():
     """Demonstrate workflow processing capabilities."""
-    print(f"\\n🚀 Workflow Processing Capabilities:")
-    print(f"\\n📋 Available Processing Scripts:")
+    print(f"\n🚀 Workflow Processing Capabilities:")
+    print(f"\n📋 Available Processing Scripts:")
     
     scripts = [
         ("test_data_matcher_simple.py", "Test data matching and sample discovery"),
@@ -123,14 +123,14 @@ def demonstrate_workflow_capabilities():
         status = "✅" if os.path.exists(script) else "❌"
         print(f"   {status} {script:<35} - {description}")
     
-    print(f"\\n📁 Output Organization:")
+    print(f"\n📁 Output Organization:")
     print(f"   outputs/")
     print(f"   ├── iqid_aligned/                     # iQID alignment results per sample")
     print(f"   ├── he_iqid_analysis/                 # H&E-iQID co-registration results")
     print(f"   ├── batch_processing_results.json     # Comprehensive batch results") 
     print(f"   └── batch_processing_summary.txt      # Human-readable summary")
     
-    print(f"\\n🔧 Configuration Features:")
+    print(f"\n🔧 Configuration Features:")
     print(f"   ✅ Unified config file (configs/unified_config.json)")
     print(f"   ✅ Base path + relative path structure")
     print(f"   ✅ Read-only data protection")
@@ -139,20 +139,20 @@ def demonstrate_workflow_capabilities():
 
 def demonstrate_sample_processing():
     """Show an example of sample processing workflow."""
-    print(f"\\n🔄 Sample Processing Workflow:")
-    print(f"\\n   1. Data Discovery & Matching")
+    print(f"\n🔄 Sample Processing Workflow:")
+    print(f"\n   1. Data Discovery & Matching")
     print(f"      └── Scan UCSF directory structure")
     print(f"      └── Match H&E and iQID samples by ID")
     print(f"      └── Validate data availability")
     
-    print(f"\\n   2. iQID Alignment Workflow")
+    print(f"\n   2. iQID Alignment Workflow")
     print(f"      └── Load raw iQID event images")
     print(f"      └── Preprocess frames (noise reduction, normalization)")
     print(f"      └── Align frames using phase correlation")
     print(f"      └── Quality control and validation")
     print(f"      └── Save aligned stack and metrics")
     
-    print(f"\\n   3. H&E-iQID Co-registration Workflow")
+    print(f"\n   3. H&E-iQID Co-registration Workflow")
     print(f"      └── Load H&E histology images")
     print(f"      └── Preprocess H&E (stain normalization, contrast)")
     print(f"      └── Register H&E to iQID coordinate system")
@@ -160,7 +160,7 @@ def demonstrate_sample_processing():
     print(f"      └── Map iQID activity to tissue regions")
     print(f"      └── Quantitative analysis and reporting")
     
-    print(f"\\n   4. Results Organization")
+    print(f"\n   4. Results Organization")
     print(f"      └── Sample-specific output directories")
     print(f"      └── JSON metadata and processing metrics")
     print(f"      └── Visualization generation")
@@ -168,7 +168,7 @@ def demonstrate_sample_processing():
 
 def main():
     """Main demonstration function."""
-    print("\\n" + "=" * 60)
+    print("\n" + "=" * 60)
     print("UCSF iQID-H&E Workflow Integration - Complete Demonstration")
     print("=" * 60)
     print("Author: Wookjin Choi <wookjin.choi@jefferson.edu>")
@@ -183,35 +183,35 @@ def main():
     # Show processing workflow
     demonstrate_sample_processing()
     
-    print(f"\\n💡 Usage Examples:")
-    print(f"\\n   # Test data matching")
+    print(f"\n💡 Usage Examples:")
+    print(f"\n   # Test data matching")
     print(f"   python test_data_matcher_simple.py")
     
-    print(f"\\n   # Process all samples automatically")
+    print(f"\n   # Process all samples automatically")
     print(f"   python run_all_samples.py")
     
-    print(f"\\n   # Interactive sample selection")
+    print(f"\n   # Interactive sample selection")
     print(f"   python interactive_workflow_runner.py")
     
     if data_available:
-        print(f"\\n✅ Integration Status: READY")
+        print(f"\n✅ Integration Status: READY")
         print(f"   - Real UCSF data discovered and matched")
         print(f"   - {len(UCSFDataMatcher(os.path.join(os.path.expanduser('~'), 'data/UCSF-Collab/data/')).get_available_samples())} samples available for processing")
         print(f"   - Both workflows updated for real data")
         print(f"   - Batch processing capabilities implemented")
     else:
-        print(f"\\n⚠️  Integration Status: SIMULATED MODE")
+        print(f"\n⚠️  Integration Status: SIMULATED MODE")
         print(f"   - UCSF data path not available")
         print(f"   - Workflows will use simulated data")
         print(f"   - All functionality available except real data loading")
     
-    print(f"\\n📚 Next Steps:")
+    print(f"\n📚 Next Steps:")
     print(f"   1. Run any of the example scripts above")
     print(f"   2. Review outputs in the outputs/ directory")
     print(f"   3. Check README_INTEGRATION.md for detailed documentation")
     print(f"   4. Customize processing parameters in configs/unified_config.json")
     
-    print(f"\\n🎉 Integration Complete!")
+    print(f"\n🎉 Integration Complete!")
     print("=" * 60)
 
 if __name__ == "__main__":
