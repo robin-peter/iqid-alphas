@@ -1,0 +1,41 @@
+{
+  "visualization": {
+    "figure_size": [15, 10],
+    "dpi": 300,
+    "style": "seaborn-v0_8",
+    "color_palette": "husl",
+    "outlier_percentiles": [1.0, 99.0],
+    "histogram_bins": 100,
+    "percentile_values": [1, 5, 10, 25, 50, 75, 90, 95, 99],
+    "title_fontsize": 14,
+    "label_fontsize": 12,
+    "tick_fontsize": 10,
+    "legend_fontsize": 10,
+    "output_format": "png",
+    "save_transparent": false,
+    "bbox_inches": "tight",
+    "show_grid": true,
+    "grid_alpha": 0.3,
+    "color_alpha": 0.7
+  },
+  "segmentation_visualization": {
+    "overlay_alpha": 0.5,
+    "mask_colormap": "Reds",
+    "show_contours": true,
+    "contour_color": "yellow",
+    "contour_linewidth": 1
+  },
+  "alignment_visualization": {
+    "reference_colormap": "Reds",
+    "moving_colormap": "Blues",
+    "overlay_alpha": 0.7,
+    "difference_colormap": "hot",
+    "show_registration_points": true
+  },
+  "batch_visualization": {
+    "max_samples_per_plot": 10,
+    "summary_statistics": ["mean", "std", "median", "min", "max"],
+    "create_individual_plots": true,
+    "create_summary_dashboard": true
+  }
+}

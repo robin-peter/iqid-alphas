@@ -1,0 +1,17 @@
+2025-06-17 05:21:24,804:INFO:Assembling H&E stack from: path/to/your/image_directory
+2025-06-17 05:21:24,804:ERROR:Failed to align and register images for path/to/your/image_directory: zero-size array to reduction operation maximum which has no identity
+Traceback (most recent call last):
+  File "/home/wxc151/iqid-alphas/archive/automate_image_alignment.py", line 16, in align_and_register_images
+    image_stack = assemble_stack_hne(imdir=image_dir, fformat=fformat, color=color, pad=True)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/wxc151/iqid-alphas/archive/iqid/align.py", line 117, in assemble_stack_hne
+    maxh = int(np.max(temp[:, 0]))
+               ^^^^^^^^^^^^^^^^^^
+  File "<__array_function__ internals>", line 200, in amax
+  File "/opt/conda/lib/python3.11/site-packages/numpy/core/fromnumeric.py", line 2820, in amax
+    return _wrapreduction(a, np.maximum, 'max', axis, None, out,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/conda/lib/python3.11/site-packages/numpy/core/fromnumeric.py", line 86, in _wrapreduction
+    return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: zero-size array to reduction operation maximum which has no identity

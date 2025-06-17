@@ -1,0 +1,172 @@
+{
+  "logging": {
+    "level": "INFO",
+    "file_name": "error_handler.log",
+    "max_file_size_mb": 10,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "enable_structured_logging": true,
+    "log_to_console": true,
+    "log_to_file": true
+  },
+  "error_handling": {
+    "auto_recovery": true,
+    "max_retry_attempts": 3,
+    "retry_delay_seconds": 5,
+    "exponential_backoff": true,
+    "capture_traceback": true,
+    "save_error_context": true,
+    "enable_error_classification": true,
+    "enable_severity_assessment": true,
+    "enable_suggestion_generation": true
+  },
+  "recovery_strategies": {
+    "configuration": {
+      "enabled": true,
+      "fallback_to_defaults": true,
+      "validate_after_recovery": true
+    },
+    "data_input": {
+      "enabled": true,
+      "try_alternative_formats": true,
+      "try_alternative_paths": true,
+      "create_synthetic_data": false
+    },
+    "memory": {
+      "enabled": true,
+      "force_garbage_collection": true,
+      "enable_chunked_processing": true,
+      "reduce_memory_usage": true
+    },
+    "processing": {
+      "enabled": true,
+      "try_alternative_algorithms": true,
+      "adjust_parameters": true,
+      "skip_non_essential_steps": false
+    }
+  },
+  "notifications": {
+    "enable_notifications": true,
+    "critical_errors_only": false,
+    "notification_threshold": 5,
+    "notification_cooldown_minutes": 30,
+    "enable_email": true,
+    "enable_slack": false,
+    "enable_webhook": false,
+    "email": {
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "use_tls": true,
+      "from_address": "pipeline@example.com",
+      "to_addresses": ["admin@example.com"],
+      "username": "pipeline@example.com",
+      "password": "your_password_here",
+      "include_logs": true,
+      "include_system_info": true
+    },
+    "slack": {
+      "webhook_url": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK",
+      "channel": "#pipeline-alerts",
+      "username": "Pipeline Bot",
+      "include_context": true
+    },
+    "webhook": {
+      "url": "https://your-webhook-endpoint.com/alerts",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer your-token"
+      },
+      "timeout_seconds": 30
+    }
+  },
+  "reporting": {
+    "generate_daily_reports": true,
+    "generate_weekly_reports": true,
+    "generate_monthly_reports": true,
+    "generate_summary_reports": true,
+    "include_suggestions": true,
+    "include_statistics": true,
+    "include_trends": true,
+    "include_system_metrics": true,
+    "export_formats": ["html", "json", "csv"],
+    "auto_cleanup_old_reports": true,
+    "retention_days": 30
+  },
+  "monitoring": {
+    "enable_performance_monitoring": true,
+    "enable_resource_monitoring": true,
+    "monitoring_interval_seconds": 60,
+    "enable_alerting": true,
+    "thresholds": {
+      "memory_usage_percent": 85,
+      "cpu_usage_percent": 90,
+      "disk_usage_percent": 80,
+      "error_rate_per_hour": 10,
+      "processing_time_seconds": 300
+    },
+    "metrics_retention_days": 7,
+    "enable_trend_analysis": true
+  },
+  "quality_assurance": {
+    "enable_qa_checks": true,
+    "validate_inputs": true,
+    "validate_outputs": true,
+    "check_data_integrity": true,
+    "verify_processing_steps": true,
+    "enable_regression_detection": true,
+    "quality_thresholds": {
+      "minimum_success_rate": 0.95,
+      "maximum_error_rate": 0.05,
+      "processing_time_variance": 0.3
+    }
+  },
+  "integration": {
+    "enable_pipeline_integration": true,
+    "auto_inject_error_handling": true,
+    "wrap_critical_functions": true,
+    "enable_context_preservation": true,
+    "enable_state_recovery": true
+  },
+  "security": {
+    "sanitize_error_messages": true,
+    "remove_sensitive_data": true,
+    "encrypt_error_logs": false,
+    "enable_audit_logging": true,
+    "access_control": {
+      "require_authentication": false,
+      "allowed_users": [],
+      "admin_users": []
+    }
+  },
+  "performance": {
+    "enable_async_processing": true,
+    "batch_error_processing": true,
+    "cache_error_patterns": true,
+    "optimize_logging": true,
+    "background_reporting": true
+  },
+  "customization": {
+    "custom_error_categories": [],
+    "custom_severity_levels": [],
+    "custom_recovery_strategies": [],
+    "custom_notification_handlers": [],
+    "custom_report_templates": []
+  },
+  "output_configuration": {
+    "base_output_dir": "outputs/error_reports",
+    "create_timestamped_dirs": true,
+    "organize_by_date": true,
+    "organize_by_severity": false,
+    "organize_by_category": false,
+    "compress_old_files": true,
+    "cleanup_temp_files": true
+  },
+  "debugging": {
+    "enable_debug_mode": false,
+    "verbose_logging": false,
+    "save_debug_dumps": false,
+    "enable_interactive_debugging": false,
+    "preserve_error_state": true
+  }
+}

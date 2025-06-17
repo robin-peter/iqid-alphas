@@ -1,0 +1,85 @@
+{
+  "configuration_info": {
+    "name": "IQID-Alphas Path Configuration",
+    "version": "1.0",
+    "description": "Centralized path configuration for all IQID-Alphas pipeline components",
+    "last_updated": "2025-06-17"
+  },
+  "base_paths": {
+    "project_root": ".",
+    "data_root": "../data",
+    "output_root": "./outputs",
+    "config_root": "./configs",
+    "src_root": "./src",
+    "test_data_root": "./test_data",
+    "cache_root": "./cache",
+    "logs_root": "./logs"
+  },
+  "data_paths": {
+    "ucsf_collab_root": "../data/UCSF-Collab/data",
+    "reupload_directory": "../data/UCSF-Collab/data/ReUpload",
+    "datapush1_directory": "../data/UCSF-Collab/data/DataPush1",
+    "raw_data_directory": "../data/raw",
+    "processed_data_directory": "../data/processed",
+    "backup_data_directory": "../data/backup"
+  },
+  "output_paths": {
+    "iqid_only_processing": "./outputs/iqid_only_processing",
+    "combined_he_iqid_processing": "./outputs/combined_he_iqid_processing",
+    "simple_pipeline_processing": "./outputs/simple_pipeline_processing",
+    "segmentation_outputs": "./outputs/segmentation",
+    "alignment_outputs": "./outputs/alignment",
+    "analysis_outputs": "./outputs/analysis",
+    "visualization_outputs": "./outputs/visualization",
+    "evaluation_outputs": "./outputs/evaluation",
+    "batch_processing_outputs": "./outputs/batch_processing",
+    "quality_control_outputs": "./outputs/quality_control"
+  },
+  "intermediate_paths": {
+    "temp_processing": "./temp",
+    "cache_directory": "./cache",
+    "debug_outputs": "./outputs/debug",
+    "logs_directory": "./logs",
+    "reports_directory": "./evaluation/reports"
+  },
+  "config_paths": {
+    "pipeline_configs": "./configs",
+    "iqid_pipeline_config": "./configs/iqid_pipeline_config.json",
+    "combined_pipeline_config": "./configs/combined_pipeline_config.json",
+    "test_config": "./configs/test_config.json",
+    "path_config": "./configs/path_config.json"
+  },
+  "src_paths": {
+    "core_modules": "./src/core",
+    "iqid_modules": "./src/core/iqid",
+    "visualization_modules": "./src/visualization",
+    "utilities_modules": "./src/utils",
+    "pipeline_modules": "./pipelines"
+  },
+  "test_paths": {
+    "test_data": "./test_data",
+    "sample_data": "./test_data/sample_001",
+    "validation_data": "./test_data/validation",
+    "unit_tests": "./tests",
+    "integration_tests": "./tests/integration",
+    "test_outputs": "./outputs/test_results"
+  },
+  "external_dependencies": {
+    "python_path_additions": [
+      "./src",
+      "./pipelines",
+      "."
+    ]
+  },
+  "path_validation": {
+    "required_directories": [
+      "./outputs",
+      "./configs",
+      "./src",
+      "./test_data",
+      "./logs"
+    ],
+    "auto_create_missing": true,
+    "validate_on_startup": true
+  }
+}

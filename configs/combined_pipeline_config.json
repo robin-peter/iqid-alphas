@@ -2,9 +2,12 @@
   "pipeline_name": "Combined_HE_iQID_Processing",
   "version": "1.0",
   "description": "Configuration for combined H&E and iQID processing pipeline (DataPush1 data)",
+  "path_config_file": "./configs/path_config.json",
   "paths": {
-    "datapush_root": "../data/UCSF-Collab/data/DataPush1",
-    "output_root": "./outputs/combined_he_iqid_processing"
+    "data_source": "datapush1_directory",
+    "output_directory": "combined_he_iqid_processing",
+    "temp_directory": "temp_processing",
+    "logs_directory": "logs_directory"
   },
   "processing_parameters": {
     "he_segmentation": {
@@ -33,5 +36,11 @@
     "min_roi_size": 50,
     "max_rois_per_sample": 100,
     "alignment_quality_threshold": 0.8
+  },
+  "output_settings": {
+    "save_intermediate_results": true,
+    "create_visualizations": true,
+    "generate_reports": true,
+    "save_alignment_diagnostics": true
   }
 }

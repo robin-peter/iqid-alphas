@@ -1,0 +1,211 @@
+{
+  "evaluation": {
+    "sorting_methods": [
+      "intensity",
+      "area", 
+      "combined",
+      "priority_score",
+      "temporal"
+    ],
+    "alignment_methods": [
+      "phase_correlation",
+      "feature_based",
+      "mutual_information",
+      "cross_correlation"
+    ],
+    "quality_thresholds": {
+      "alignment_score": 0.8,
+      "segmentation_dice": 0.7,
+      "processing_success_rate": 0.95,
+      "quantification_accuracy": 0.9,
+      "reproducibility_score": 0.85
+    },
+    "advanced_metrics": {
+      "enable_statistical_analysis": true,
+      "enable_trend_analysis": true,
+      "enable_outlier_detection": true,
+      "confidence_interval": 0.95
+    },
+    "sorting": {
+      "methods": ["intensity", "area", "combined"],
+      "enable_comparison": true,
+      "quality_metrics": ["consistency", "diversity", "coverage"]
+    },
+    "alignment": {
+      "methods": ["phase_correlation", "feature_based"],
+      "quality_metrics": ["alignment_score", "registration_error"],
+      "tolerance_thresholds": {
+        "translation_pixels": 10,
+        "rotation_degrees": 5,
+        "scale_factor": 0.1
+      }
+    },
+    "batch_processing": {
+      "test_sizes": [5, 10, 25, 50],
+      "metrics": ["processing_time", "memory_usage", "success_rate"],
+      "scalability_analysis": true
+    },
+    "quality_assessment": {
+      "stages": ["preprocessing", "segmentation", "alignment", "quantification"],
+      "overall_metrics": ["accuracy", "precision", "recall"],
+      "stage_specific_metrics": true
+    },
+    "performance": {
+      "configurations": ["default", "optimized", "memory_efficient"],
+      "metrics": ["processing_time", "memory_usage", "throughput"],
+      "benchmarking": true
+    }
+  },
+  "batch_processing": {
+    "max_samples": 100,
+    "parallel_workers": 4,
+    "memory_limit_gb": 8,
+    "timeout_minutes": 30,
+    "retry_attempts": 3,
+    "test_batch_sizes": [5, 10, 25, 50, 100],
+    "scalability_analysis": {
+      "enable_linear_fit": true,
+      "enable_performance_prediction": true,
+      "memory_profiling": true
+    }
+  },
+  "cross_sample_alignment": {
+    "min_sample_pairs": 10,
+    "max_sample_pairs": 50,
+    "alignment_tolerance": {
+      "translation_pixels": 10,
+      "rotation_degrees": 5,
+      "scale_factor": 0.1
+    },
+    "quality_metrics": [
+      "mutual_information",
+      "normalized_cross_correlation",
+      "structural_similarity",
+      "peak_signal_noise_ratio"
+    ]
+  },
+  "quality_assessment": {
+    "stages": [
+      "preprocessing",
+      "segmentation", 
+      "alignment",
+      "quantification",
+      "visualization"
+    ],
+    "metrics_per_stage": {
+      "preprocessing": [
+        "noise_reduction_score",
+        "contrast_enhancement_score",
+        "artifact_removal_score"
+      ],
+      "segmentation": [
+        "dice_coefficient",
+        "jaccard_index",
+        "hausdorff_distance",
+        "boundary_accuracy"
+      ],
+      "alignment": [
+        "alignment_accuracy",
+        "registration_error",
+        "transformation_stability"
+      ],
+      "quantification": [
+        "measurement_precision",
+        "measurement_accuracy",
+        "repeatability_score"
+      ]
+    },
+    "reference_standards": {
+      "use_ground_truth": true,
+      "ground_truth_path": "test_data/ground_truth",
+      "expert_annotations": true,
+      "cross_validation": true
+    }
+  },
+  "performance_benchmarking": {
+    "configurations": {
+      "default": {
+        "parallel_processing": false,
+        "memory_optimization": false,
+        "gpu_acceleration": false
+      },
+      "optimized": {
+        "parallel_processing": true,
+        "memory_optimization": true,
+        "gpu_acceleration": false,
+        "max_workers": 4
+      },
+      "high_performance": {
+        "parallel_processing": true,
+        "memory_optimization": true,
+        "gpu_acceleration": true,
+        "max_workers": 8,
+        "memory_mapping": true
+      },
+      "memory_efficient": {
+        "parallel_processing": false,
+        "memory_optimization": true,
+        "chunk_processing": true,
+        "low_memory_mode": true
+      }
+    },
+    "benchmark_metrics": [
+      "processing_time",
+      "memory_usage",
+      "cpu_utilization",
+      "throughput",
+      "latency",
+      "scalability_factor"
+    ],
+    "system_monitoring": {
+      "enable_resource_monitoring": true,
+      "monitoring_interval_seconds": 1,
+      "enable_profiling": true
+    }
+  },
+  "reporting": {
+    "output_formats": ["html", "pdf", "json", "csv"],
+    "include_visualizations": true,
+    "include_raw_data": true,
+    "include_statistical_analysis": true,
+    "generate_executive_summary": true,
+    "detailed_recommendations": true
+  },
+  "visualization": {
+    "create_comparison_plots": true,
+    "create_trend_analysis": true,
+    "create_distribution_plots": true,
+    "create_performance_dashboards": true,
+    "plot_style": "publication",
+    "save_formats": ["png", "pdf", "svg"],
+    "dpi": 300
+  },
+  "data_sources": {
+    "test_data_dir": "test_data",
+    "synthetic_data_dir": "test_data/synthetic",
+    "real_data_dir": "test_data/real",
+    "benchmark_data_dir": "test_data/benchmark"
+  },
+  "output_configuration": {
+    "base_output_dir": "outputs/advanced_evaluation",
+    "create_timestamped_dirs": true,
+    "organize_by_evaluation_type": true,
+    "compress_large_outputs": true,
+    "cleanup_temp_files": true
+  },
+  "validation": {
+    "enable_input_validation": true,
+    "enable_output_validation": true,
+    "enable_reproducibility_check": true,
+    "random_seed": 42,
+    "validation_sample_percentage": 10
+  },
+  "logging": {
+    "log_level": "INFO",
+    "log_to_file": true,
+    "log_file_name": "advanced_evaluation.log",
+    "include_timestamps": true,
+    "include_performance_logs": true,
+    "enable_debug_mode": false
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "evaluation_timestamp": "2025-06-17T10:37:54.065024",
+  "pipeline_version": "1.0",
+  "evaluation_type": "comprehensive_pipeline_assessment",
+  "stages": {
+    "raw_data": {
+      "total_samples": 4,
+      "iqid_samples": 2,
+      "he_samples": 2,
+      "paired_samples": 2,
+      "data_quality": {},
+      "file_formats": {},
+      "image_characteristics": {
+        "iqid": [
+          {
+            "shape": [
+              512,
+              512
+            ],
+            "dtype": "uint16",
+            "min_value": 0.0,
+            "max_value": 3543.0,
+            "mean_value": 555.3498878479004,
+            "file_size_mb": 0.5001163482666016
+          },
+          {
+            "shape": [
+              512,
+              512
+            ],
+            "dtype": "uint16",
+            "min_value": 0.0,
+            "max_value": 1407.0,
+            "mean_value": 265.3113021850586,
+            "file_size_mb": 0.5001163482666016
+          }
+        ],
+        "he": [
+          {
+            "shape": [
+              512,
+              512,
+              3
+            ],
+            "dtype": "uint8",
+            "min_value": 50.0,
+            "max_value": 199.0,
+            "mean_value": 123.32091267903645,
+            "file_size_mb": 0.7501335144042969
+          },
+          {
+            "shape": [
+              512,
+              512,
+              3
+            ],
+            "dtype": "uint8",
+            "min_value": 80.0,
+            "max_value": 200.0,
+            "mean_value": 130.08346048990884,
+            "file_size_mb": 0.7501335144042969
+          }
+        ]
+      }
+    },
+    "segmentation": {
+      "tests_run": 0,
+      "successful_segmentations": 0,
+      "failed_segmentations": 0,
+      "quality_scores": [],
+      "processing_times": [],
+      "coverage_statistics": {},
+      "method_comparison": {},
+      "average_quality": 0,
+      "quality_std": 0,
+      "success_rate": 0.0
+    },
+    "alignment": {
+      "alignment_tests": 0,
+      "successful_alignments": 0,
+      "failed_alignments": 0,
+      "alignment_errors": [],
+      "shift_magnitudes": [],
+      "alignment_methods": {},
+      "registration_accuracy": {},
+      "success_rate": 0.0
+    },
+    "mask_quality": {
+      "masks_evaluated": 0,
+      "tissue_masks": 0,
+      "activity_masks": 0,
+      "combined_masks": 0,
+      "coverage_analysis": {},
+      "consistency_metrics": {},
+      "quality_assessment": {}
+    },
+    "batch_processing": {
+      "batch_tests_run": 0,
+      "total_samples_processed": 0,
+      "successful_batches": 0,
+      "failed_batches": 0,
+      "processing_times": [],
+      "throughput_analysis": {},
+      "scalability_assessment": {},
+      "batch_success_rate": 0.0
+    },
+    "integration": {
+      "pipeline_tests": 2,
+      "integration_success": 0,
+      "workflow_validation": {},
+      "end_to_end_testing": {},
+      "consistency_checks": {}
+    }
+  }
+}

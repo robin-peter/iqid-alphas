@@ -1,0 +1,154 @@
+{
+  "validation_timestamp": "2025-06-17T12:02:25.179282",
+  "pipeline_version": "1.0",
+  "validation_type": "production_readiness_assessment",
+  "test_suites": {},
+  "performance_metrics": {
+    "dependencies": 0,
+    "pipeline_components": 100,
+    "test_data": 100,
+    "stress_tests": 33.33333333333333,
+    "output_structure": 100
+  },
+  "production_readiness": false,
+  "dependencies": {
+    "status": false,
+    "packages": {
+      "numpy": "1.24.4",
+      "matplotlib": "3.8.0",
+      "tifffile": "2023.9.26",
+      "scikit-image": "MISSING",
+      "scipy": "1.11.3",
+      "pandas": "2.1.1"
+    }
+  },
+  "pipeline_components": {
+    "SimpleiQIDPipeline": true,
+    "iQIDProcessingPipeline": true,
+    "CombinedHEiQIDPipeline": true
+  },
+  "test_data": {
+    "test_data_exists": true,
+    "samples_found": 2,
+    "paired_samples": 2,
+    "data_integrity": {
+      "sample_001": {
+        "he_exists": true,
+        "iqid_exists": true,
+        "he_files": 1,
+        "iqid_files": 1
+      },
+      "sample_002": {
+        "he_exists": true,
+        "iqid_exists": true,
+        "he_files": 1,
+        "iqid_files": 1
+      }
+    }
+  },
+  "stress_tests": {
+    "simple_pipeline": {
+      "normal_data": {
+        "success": false,
+        "error": "string indices must be integers, not 'str'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "small_image": {
+        "success": false,
+        "error": "string indices must be integers, not 'str'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "large_image": {
+        "success": false,
+        "error": "string indices must be integers, not 'str'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "noisy_data": {
+        "success": false,
+        "error": "string indices must be integers, not 'str'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "low_contrast": {
+        "success": false,
+        "error": "string indices must be integers, not 'str'",
+        "processing_time": 0,
+        "output_quality": 0
+      }
+    },
+    "iqid_pipeline": {
+      "normal_data": {
+        "success": true,
+        "processing_time": 0.003827,
+        "output_quality": 85
+      },
+      "small_image": {
+        "success": true,
+        "processing_time": 0.001388,
+        "output_quality": 85
+      },
+      "large_image": {
+        "success": true,
+        "processing_time": 0.010659,
+        "output_quality": 85
+      },
+      "noisy_data": {
+        "success": true,
+        "processing_time": 0.003475,
+        "output_quality": 85
+      },
+      "low_contrast": {
+        "success": true,
+        "processing_time": 0.003622,
+        "output_quality": 85
+      }
+    },
+    "combined_pipeline": {
+      "normal_data": {
+        "success": false,
+        "error": "'CombinedHEiQIDPipeline' object has no attribute 'process_sample'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "small_image": {
+        "success": false,
+        "error": "'CombinedHEiQIDPipeline' object has no attribute 'process_sample'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "large_image": {
+        "success": false,
+        "error": "'CombinedHEiQIDPipeline' object has no attribute 'process_sample'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "noisy_data": {
+        "success": false,
+        "error": "'CombinedHEiQIDPipeline' object has no attribute 'process_sample'",
+        "processing_time": 0,
+        "output_quality": 0
+      },
+      "low_contrast": {
+        "success": false,
+        "error": "'CombinedHEiQIDPipeline' object has no attribute 'process_sample'",
+        "processing_time": 0,
+        "output_quality": 0
+      }
+    }
+  },
+  "output_structure": {
+    "output_directories": {
+      "./outputs/simple_pipeline": false,
+      "./outputs/iqid_pipeline": false,
+      "./outputs/combined_pipeline": false,
+      "./outputs/segmentation": false,
+      "./outputs/comprehensive_evaluation": true
+    },
+    "expected_files": {},
+    "file_formats": {}
+  },
+  "overall_score": 66.66666666666666
+}

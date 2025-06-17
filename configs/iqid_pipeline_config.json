@@ -2,9 +2,12 @@
   "pipeline_name": "iQID_Only_Processing",
   "version": "1.0",
   "description": "Configuration for iQID-only processing pipeline (ReUpload data)",
+  "path_config_file": "./configs/path_config.json",
   "paths": {
-    "reupload_root": "../data/UCSF-Collab/data/ReUpload",
-    "output_root": "./outputs/iqid_only_processing"
+    "data_source": "reupload_directory",
+    "output_directory": "iqid_only_processing",
+    "temp_directory": "temp_processing",
+    "logs_directory": "logs_directory"
   },
   "processing_parameters": {
     "segmentation": {
@@ -20,5 +23,10 @@
   "quality_thresholds": {
     "min_roi_size": 50,
     "max_rois_per_sample": 100
+  },
+  "output_settings": {
+    "save_intermediate_results": true,
+    "create_visualizations": true,
+    "generate_reports": true
   }
 }

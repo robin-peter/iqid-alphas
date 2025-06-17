@@ -1,0 +1,24 @@
+{
+  "pipeline_name": "iQID_Test_Pipeline",
+  "version": "1.0",
+  "description": "Test configuration for pipeline validation",
+  "paths": {
+    "reupload_root": "./test_data",
+    "output_root": "./outputs/pipeline_test"
+  },
+  "processing_parameters": {
+    "segmentation": {
+      "method": "morphological",
+      "min_size": 50,
+      "watershed_markers": "auto"
+    },
+    "alignment": {
+      "method": "boundary_based",
+      "alignment_type": "centroid_alignment"
+    }
+  },
+  "quality_thresholds": {
+    "min_roi_size": 50,
+    "max_rois_per_sample": 100
+  }
+}
