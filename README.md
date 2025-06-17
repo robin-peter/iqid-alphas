@@ -69,3 +69,61 @@ iqid-alphas/ (main project directory)
     - Additionally, select images are visible in the demo notebook previews. Please feel free to
       make one copy of the notebooks for viewing and another to experiment using your own data.
     - Please contact the authors if you would like to request access to the data.
+
+## New Automation Scripts
+The repository now includes three new automation scripts to streamline the processing of listmode data, image alignment, and dose kernel processing:
+
+1. `automate_processing.py`:
+   - Automates loading and processing of listmode data using functions in `iqid/process_object.py`.
+   - Uses `ClusterData` class to load and process data, implements functions to filter, correct, and analyze data.
+   - Automates generation of spatial images and temporal information using `image_from_listmode` and `image_from_big_listmode` methods.
+   - Implements automated contour detection and ROI extraction using `get_contours` and `get_ROIs` methods.
+   - Saves processed data and results in a structured format for further analysis.
+
+2. `automate_image_alignment.py`:
+   - Automates alignment and registration of images using functions in `iqid/align.py`.
+   - Uses `assemble_stack` and `coarse_stack` functions to create and align image stacks.
+   - Implements automated padding and cropping of images using `pad_stack_he` and `crop_down` functions.
+   - Automates generation of registered image stacks and saves results in a structured format for further analysis.
+
+3. `automate_dose_kernel_processing.py`:
+   - Automates processing of dose kernels and convolution using functions in `iqid/dpk.py`.
+   - Uses `load_txt_kernel` and `mev_to_mgy` functions to load and convert dose kernels.
+   - Implements automated radial averaging and padding of kernels using `radial_avg_kernel` and `pad_kernel_to_vsize` functions.
+   - Automates convolution of dose kernels with activity image stacks and saves results in a structured format for further analysis.
+
+## Centralized Configuration Management
+A centralized configuration management system using JSON has been added to manage configuration parameters across the three automation scripts. The `config.json` file stores input/output paths, processing thresholds, and kernel sizes. The automation scripts have been updated to read configuration parameters from `config.json`.
+
+## Robust Error Handling and Logging
+Robust error handling and logging have been implemented in each automation script using Python's `logging` module. This provides clear, actionable insights into script execution, warnings, and errors. Error handling has been added for missing input files, corrupted data, and failed computational steps. Example log message for a failed processing step: `logger.error("Failed to process file %s: %s", filename, str(e))`.
+
+## Performance Optimization
+Performance bottlenecks in `iqid/process_object.py`, `iqid/align.py`, and `iqid/dpk.py` have been identified. Optimization techniques such as parallel processing, lazy loading, and optimized data structures have been suggested to improve performance.
+
+## Testing and Validation
+A testing and validation strategy for the automated workflows has been outlined. Unit tests for individual functions and integration tests for full end-to-end workflows have been created. The output of automated scripts is programmatically validated to ensure correctness and adherence to expected results.
+
+## CI/CD Integration
+Steps for integrating automation scripts into a CI/CD pipeline using GitHub Actions have been proposed. Quality gates based on the output of automated scripts have been defined to prevent merging pull requests if certain criteria are not met.
+
+## Unit Tests
+The repository includes unit tests for the new automation scripts:
+
+1. `test_automate_processing.py`:
+   - Tests loading and processing of listmode data.
+   - Tests generation of spatial images and temporal information.
+   - Tests contour detection and ROI extraction.
+   - Tests saving of processed data and results.
+
+2. `test_automate_image_alignment.py`:
+   - Tests image alignment and registration.
+   - Tests padding and cropping of images.
+   - Tests generation of registered image stacks.
+   - Tests saving of registered image stacks.
+
+3. `test_automate_dose_kernel_processing.py`:
+   - Tests processing of dose kernels.
+   - Tests radial averaging and padding of kernels.
+   - Tests convolution of dose kernels with activity image stacks.
+   - Tests saving of processed dose kernels and results.
