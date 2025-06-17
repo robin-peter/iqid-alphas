@@ -105,7 +105,7 @@ def assemble_stack(imdir=None, fformat='tif', pad=False):
 def assemble_stack_hne(imdir=None, fformat='tif', color=(0, 0, 0), pad=True):
     data_path = os.path.join('.', imdir)
     fileList = glob.glob(os.path.join(data_path, '*.' + fformat))
-    fileList.sort(key=iq.natural_keys)
+    fileList.sort(key=helper.natural_keys)
 
     if pad:
         temp = np.zeros((len(fileList), 2))
@@ -336,7 +336,7 @@ def get_SSD(im1, im2):
     return (SSD)
 
 
-def coarse_rotation(mov, ref, deg=2, interpolation=0, gauss=5, preserve_range=True, recenter=False):
+def coarse_rotation(mov, ref, deg=2, interpolation=0, gauss=5, preserve_range=True, recenter=False, convert_to_grayscale_for_ssd=False):
     """Coarse rotation of an image to minimize SSD (MSE) compared to reference.
 
     Brute-force method that checks the SSD between the reference image (ref)
@@ -376,12 +376,34 @@ def coarse_rotation(mov, ref, deg=2, interpolation=0, gauss=5, preserve_range=Tr
         mov = recenter_im(mov)
         ref = recenter_im(ref)
 
+    # Convert to float32 for GaussianBlur compatibility
+    mov_for_blur = mov.astype(np.float32)
+    ref_for_blur = ref.astype(np.float32)
+
+    # Prepare images for SSD calculation (optional grayscale conversion)
+    mov_for_ssd = mov_for_blur
+    ref_for_ssd = ref_for_blur
+
+    if convert_to_grayscale_for_ssd and mov_for_blur.ndim == 3 and mov_for_blur.shape[-1] in [3, 4]:
+        # Ensure uint8 for cvtColor if it's not already scaled 0-1 float
+        # Assuming mov_for_blur might be 0-255 float32 from .astype(np.float32) on uint8 images
+        if np.max(mov_for_blur) > 1.5: # Heuristic for 0-255 range
+            mov_for_ssd = cv2.cvtColor(mov_for_blur.astype(np.uint8), cv2.COLOR_RGB2GRAY).astype(np.float32)
+        else: # Assuming 0-1 range float
+            mov_for_ssd = cv2.cvtColor((mov_for_blur * 255).astype(np.uint8), cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+    
+    if convert_to_grayscale_for_ssd and ref_for_blur.ndim == 3 and ref_for_blur.shape[-1] in [3, 4]:
+        if np.max(ref_for_blur) > 1.5:
+            ref_for_ssd = cv2.cvtColor(ref_for_blur.astype(np.uint8), cv2.COLOR_RGB2GRAY).astype(np.float32)
+        else:
+            ref_for_ssd = cv2.cvtColor((ref_for_blur * 255).astype(np.uint8), cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+
     if gauss:
-        gmov = cv2.GaussianBlur(mov, (gauss, gauss), 0)
-        gref = cv2.GaussianBlur(ref, (gauss, gauss), 0)
+        gmov = cv2.GaussianBlur(mov_for_ssd, (gauss, gauss), 0)
+        gref = cv2.GaussianBlur(ref_for_ssd, (gauss, gauss), 0)
     else:
-        gmov = mov
-        gref = ref
+        gmov = mov_for_ssd
+        gref = ref_for_ssd
 
     num_measurements = int(np.floor(360/deg))
     SSD = np.zeros(num_measurements)
@@ -395,7 +417,7 @@ def coarse_rotation(mov, ref, deg=2, interpolation=0, gauss=5, preserve_range=Tr
     return (rot, outdeg)
 
 
-def coarse_stack(unreg, deg=2, avg_over=1, preserve_range=True, return_deg=False):
+def coarse_stack(unreg, deg=2, avg_over=1, preserve_range=True, return_deg=False, convert_to_grayscale_for_ssd=False):
     """Align a stack of images using SSD-minimizing coarse rotation.
 
     Each image n is coarse aligned (see coarse_rotation) to the previous
@@ -434,13 +456,13 @@ def coarse_stack(unreg, deg=2, avg_over=1, preserve_range=True, return_deg=False
         ref = np.mean(reg[:i, :, :], axis=0)
         mov = unreg[i, :, :]
         reg[i, :, :], degs[i] = coarse_rotation(
-            mov, ref, deg, preserve_range=preserve_range)
+            mov, ref, deg, preserve_range=preserve_range, convert_to_grayscale_for_ssd=convert_to_grayscale_for_ssd)
 
     for i in np.arange(avg_over, len(unreg)):
         ref = np.mean(reg[(i-avg_over):i, :, :], axis=0)
         mov = unreg[i, :, :]
         reg[i, :, :], degs[i] = coarse_rotation(
-            mov, ref, deg, preserve_range=preserve_range)
+            mov, ref, deg, preserve_range=preserve_range, convert_to_grayscale_for_ssd=convert_to_grayscale_for_ssd)
 
     if return_deg:
         return (reg, degs)

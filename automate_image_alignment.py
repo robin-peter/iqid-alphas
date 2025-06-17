@@ -10,24 +10,28 @@ from iqid.align import assemble_stack, assemble_stack_hne, coarse_stack, pad_sta
 logging.basicConfig(filename='automate_image_alignment.log', level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
-def align_and_register_images(image_dir, output_dir, fformat='tif', pad=False, deg=2, avg_over=1, subpx=1, color=(0, 0, 0)):
+def align_and_register_images(image_dir, output_dir, fformat='tif', deg=2, avg_over=1, subpx=1, color=(0, 0, 0), convert_to_grayscale_for_ssd=True):
     try:
-        # Assemble image stack
+        logging.info(f"Assembling H&E stack from: {image_dir}")
         image_stack = assemble_stack_hne(imdir=image_dir, fformat=fformat, color=color, pad=True)
+
+        if image_stack is None or len(image_stack) == 0:
+            logging.warning(f"No images found or assembled from {image_dir}. Skipping alignment.")
+            return
         
-        # Coarse align image stack
-        aligned_stack = coarse_stack(image_stack, deg=deg, avg_over=avg_over)
+        logging.info(f"Coarsely aligning stack with {len(image_stack)} images.")
+        aligned_stack = coarse_stack(image_stack, deg=deg, avg_over=avg_over, convert_to_grayscale_for_ssd=convert_to_grayscale_for_ssd)
         
         # Pad image stack
-        padded_stack = pad_stack_he(data_path=image_dir, fformat=fformat, color=color, savedir=output_dir)
+        # padded_stack = pad_stack_he(data_path=image_dir, fformat=fformat, color=color, savedir=output_dir) # Removed
         
         # Crop down image stack
-        cropped_stack = crop_down(padded_stack, aligned_stack)
+        # cropped_stack = crop_down(padded_stack, aligned_stack) # Removed or commented out
         
-        # Save registered image stack
-        save_registered_images(cropped_stack, output_dir, fformat)
+        logging.info(f"Saving registered stack to: {output_dir}")
+        save_registered_images(aligned_stack, output_dir, fformat)
     except Exception as e:
-        logging.error("Failed to align and register images: %s", str(e))
+        logging.error(f"Failed to align and register images for {image_dir}: {str(e)}", exc_info=True)
         raise
 
 def save_registered_images(image_stack, output_dir, fformat='tif'):
@@ -40,22 +44,23 @@ def save_registered_images(image_stack, output_dir, fformat='tif'):
         logging.error("Failed to save registered images: %s", str(e))
         raise
 
-def main(image_dir, output_dir, fformat='tif', pad=False, deg=2, avg_over=1, subpx=1, color=(0, 0, 0)):
+def main(image_dir, output_dir): # fformat, pad, deg etc. are loaded from config inside main
     try:
         with open('config.json', 'r') as f:
-            config = json.load(f)
+            config_params = json.load(f)['automate_image_alignment']
 
-        # image_dir and output_dir are now passed as arguments
-        fformat = config['automate_image_alignment']['fformat']
-        pad = config['automate_image_alignment']['pad']
-        deg = config['automate_image_alignment']['deg']
-        avg_over = config['automate_image_alignment']['avg_over']
-        subpx = config['automate_image_alignment']['subpx']
-        color = config['automate_image_alignment']['color']
+        # image_dir and output_dir are from args
+        fformat = config_params.get('fformat', 'tif')
+        # pad = config_params.get('pad', False) # Still read but not explicitly used for H&E assembly padding
+        deg = config_params.get('deg', 2)
+        avg_over = config_params.get('avg_over', 1)
+        subpx = config_params.get('subpx', 1) # Kept for signature, though not used by assemble_stack_hne
+        color = tuple(config_params.get('color', [0, 0, 0]))
 
-        align_and_register_images(image_dir, output_dir, fformat, pad, deg, avg_over, subpx, color)
+
+        align_and_register_images(image_dir, output_dir, fformat, deg, avg_over, subpx, color, convert_to_grayscale_for_ssd=True)
     except Exception as e:
-        logging.error("Failed to complete main image alignment: %s", str(e))
+        logging.error(f"Failed to complete main image alignment for {image_dir}: {str(e)}", exc_info=True)
         raise
 
 if __name__ == "__main__":
@@ -68,4 +73,4 @@ if __name__ == "__main__":
 
     # Call main with the parsed command-line arguments for image_dir and output_dir
     # Other parameters will still be loaded from config.json within main() for now
-    main(args.image_dir, args.output_dir)
+    main(args.image_dir, args.output_dir) # Parameters like fformat, deg, etc., will be loaded from config inside main
