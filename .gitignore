@@ -42,7 +42,9 @@ wheels/
 ehthumbs.db
 Thumbs.db
 
-# Git rebase files
-GIT_REBASE_SUMMARY.md
 output*
 data*
+logs
+intermediate
+*.log
+

@@ -1,0 +1,150 @@
+{
+    "data_paths": {
+        "ucsf_base_dir": "../data/UCSF-Collab/data/",
+        "readonly_warning": "CRITICAL: All UCSF data paths are READ-ONLY. No files will be written to these directories!",
+        "datapush1": {
+            "description": "Contains aligned iQID and H&E data",
+            "base_path": "../data/UCSF-Collab/data/DataPush1/",
+            "he_images": {
+                "3d_scans": "../data/UCSF-Collab/data/DataPush1/HE/3D scans/",
+                "sequential_10um": "../data/UCSF-Collab/data/DataPush1/HE/Sequential sections (10um)/"
+            },
+            "iqid_images": {
+                "3d_scans": "../data/UCSF-Collab/data/DataPush1/iQID/3D scans/",
+                "sequential_10um": "../data/UCSF-Collab/data/DataPush1/iQID/Sequential sections/"
+            }
+        },
+        "reupload": {
+            "description": "Contains iQID raw, segmented, and manually aligned data",
+            "base_path": "../data/UCSF-Collab/data/ReUpload/",
+            "iqid_reupload": {
+                "3d_scans": "../data/UCSF-Collab/data/ReUpload/iQID_reupload/3D scans/",
+                "sequential_scans": "../data/UCSF-Collab/data/ReUpload/iQID_reupload/Sequential scans/"
+            },
+            "file_structure": {
+                "raw_data": "0_*_iqid_event_image.tif",
+                "segmented": "1_segmented/mBq_X.tif",
+                "aligned": "2_aligned/mBq_corr_X.tif",
+                "lr_images": "LR_ims/mBq_X.tif",
+                "visualization": "Visualization/testAnimation_iQID.gif"
+            }
+        },
+        "visualization": {
+            "description": "Contains visualization results and animations",
+            "base_path": "../data/UCSF-Collab/data/Visualization/",
+            "animations": {
+                "combined": "testAnimation_both.gif",
+                "he_only": "testAnimation_HE.gif",
+                "iqid_full": "testAnimation_iQID_full.gif"
+            }
+        },
+        "metadata": {
+            "iqid_data": "../data/UCSF-Collab/data/iqid_data.txt",
+            "readme": "../data/UCSF-Collab/data/readme.docx",
+            "metadata_tju": "../data/UCSF-Collab/data/metadata_TJU.csv",
+            "quantitative_notes": "../data/UCSF-Collab/data/quantitative_notes.docx"
+        }
+    },
+    "storage_policy": {
+        "note": "All processing results are stored in local workflow directories",
+        "readonly_sources": "UCSF data directories are read-only - no files written there",
+        "intermediate_storage": "intermediate/ directory for temporary processing files",
+        "output_storage": "outputs/ directory for final results",
+        "log_storage": "logs/ directory for processing logs",
+        "report_storage": "reports/ directory for analysis reports"
+    },
+    "workflows": {
+        "path1_iqid_raw_to_aligned": {
+            "name": "iQID Raw to Aligned Processing",
+            "description": "Process raw iQID event images to aligned format using ReUpload data",
+            "input_source": "reupload.iqid_reupload",
+            "input_pattern": "0_*_iqid_event_image.tif",
+            "reference_aligned": "2_aligned/mBq_corr_*.tif",
+            "intermediate_dir": "intermediate/path1_iqid_alignment/",
+            "output_dir": "outputs/path1_aligned_iqid/",
+            "data_types": ["kidney", "tumor"],
+            "scan_types": ["3d_scans", "sequential_scans"],
+            "steps": [
+                "load_raw_iqid_events",
+                "preprocess_event_data",
+                "segment_tissues",
+                "align_sequences",
+                "validate_against_manual",
+                "save_aligned_data"
+            ]
+        },
+        "path2_aligned_iqid_he_coregistration": {
+            "name": "Aligned iQID + H&E Coregistration",
+            "description": "Coregister aligned iQID with H&E images from DataPush1",
+            "input_sources": {
+                "aligned_iqid": "datapush1.iqid_images",
+                "he_images": "datapush1.he_images"
+            },
+            "file_patterns": {
+                "iqid_aligned": "mBq_corr_*.tif",
+                "he_images": "P*.tif",
+                "he_sequential": "*_Lower_*.tif, *_Upper_*.tif"
+            },
+            "intermediate_dir": "intermediate/path2_coregistration/",
+            "output_dir": "outputs/path2_coregistered/",
+            "data_types": ["kidney", "tumor"],
+            "scan_types": ["3d_scans", "sequential_10um"],
+            "steps": [
+                "load_aligned_iqid",
+                "load_he_images",
+                "match_kidney_laterality",
+                "extract_tissue_features",
+                "perform_multimodal_registration",
+                "validate_coregistration",
+                "quantify_tissue_activity",
+                "save_coregistered_pairs"
+            ]
+        },
+        "visualization_workflow": {
+            "name": "Comprehensive Visualization and Animation",
+            "description": "Generate visualizations leveraging existing animations and creating new analyses",
+            "input_sources": {
+                "processed_data": "outputs/",
+                "reference_animations": "visualization.base_path",
+                "existing_gifs": ["testAnimation_both.gif", "testAnimation_HE.gif", "testAnimation_iQID_full.gif"]
+            },
+            "intermediate_dir": "intermediate/visualization/",
+            "output_dir": "outputs/visualization/",
+            "steps": [
+                "load_processed_results",
+                "analyze_existing_animations",
+                "generate_comparison_plots",
+                "create_tissue_activity_maps",
+                "generate_quality_animations",
+                "create_interactive_visualizations",
+                "save_comprehensive_report"
+            ]
+        }
+    },
+    "processing_parameters": {
+        "iqid_alignment": {
+            "frame_rate": 10,
+            "alignment_method": "phase_correlation",
+            "quality_threshold": 0.8,
+            "temporal_smoothing": true
+        },
+        "he_coregistration": {
+            "registration_method": "mutual_information",
+            "pyramid_levels": 4,
+            "iterations": 100,
+            "similarity_threshold": 0.7
+        },
+        "visualization": {
+            "plot_formats": ["png", "pdf"],
+            "dpi": 300,
+            "colormap": "viridis",
+            "overlay_alpha": 0.6
+        }
+    },
+    "output_organization": {
+        "intermediate_retention": "7_days",
+        "create_thumbnails": true,
+        "generate_metadata": true,
+        "log_all_operations": true
+    }
+}

@@ -1,0 +1,154 @@
+{
+  "workflow_name": "UCSF iQID Alignment",
+  "version": "2.0.0",
+  "description": "Configuration for UCSF iQID raw data alignment workflow - Updated for real UCSF data structure",
+  
+  "data_paths": {
+    "base_path": "/home/wxc151/data/UCSF-Collab/data/",
+    "readonly_warning": "CRITICAL: All UCSF data paths are READ-ONLY. No files will be written to these directories!",
+    "datapush1": {
+      "description": "Contains aligned iQID and H&E data",
+      "base_path": "DataPush1/",
+      "he_images": {
+        "3d_scans": "DataPush1/HE/3D/",
+        "sequential_10um": "DataPush1/HE/Sequential sections (10um)/"
+      },
+      "iqid_images": {
+        "3d_scans": "DataPush1/iQID/3D/",
+        "sequential_10um": "DataPush1/iQID/Sequential sections/"
+      }
+    },
+    "reupload": {
+      "description": "Contains iQID raw, segmented, and manually aligned data",
+      "base_path": "ReUpload/",
+      "iqid_reupload": {
+        "3d_scans": "ReUpload/iQID_reupload/3D/",
+        "sequential_scans": "ReUpload/iQID_reupload/Sequential scans/"
+      },
+      "file_structure": {
+        "raw_data": "0_*_iqid_event_image.tif",
+        "segmented": "1_segmented/mBq_X.tif",
+        "aligned": "2_aligned/mBq_corr_X.tif",
+        "lr_images": "LR_ims/mBq_X.tif",
+        "visualization": "Visualization/testAnimation_iQID.gif"
+      }
+    },
+    "visualization": {
+      "description": "Contains visualization results and animations",
+      "base_path": "Visualization/",
+      "animations": {
+        "combined": "testAnimation_both.gif",
+        "he_only": "testAnimation_HE.gif",
+        "iqid_full": "testAnimation_iQID_full.gif"
+      }
+    },
+    "metadata": {
+      "iqid_data": "iqid_data.txt",
+      "readme": "readme.docx",
+      "metadata_tju": "metadata_TJU.csv",
+      "quantitative_notes": "quantitative_notes.docx"
+    },
+    "file_patterns": {
+      "raw_events": "0_*_iqid_event_image.tif",
+      "aligned_reference": "mBq_corr_*.tif",
+      "segmented": "1_segmented/mBq_*.tif",
+      "general_tiff": "*.tif",
+      "general_tiff_stack": "*.tiff"
+    },
+    "tissue_types": ["Kidney", "Tumor"],
+    "sample_structure": {
+      "kidney_pattern": "D*M*(P*)_[LR]",
+      "tumor_pattern": "D* M* tumor *um",
+      "day_pattern": "D[0-9]+",
+      "mouse_pattern": "M[0-9]+"
+    },
+    "expected_subdirs": {
+      "kidney_examples": ["0_cropped_iqid_raw_image", "1_segmented", "2_final_dose"],
+      "tumor_examples": ["0_cropped_iqid_raw_image", "1_segmented", "2_final_dose"]
+    }
+  },
+  
+  "storage_policy": {
+    "note": "All processing results are stored in local workflow directories",
+    "readonly_sources": "UCSF data directories are read-only - no files written there", 
+    "intermediate_storage": "intermediate/ directory for temporary processing files",
+    "output_storage": "outputs/ directory for final results",
+    "log_storage": "logs/ directory for processing logs",
+    "report_storage": "reports/ directory for analysis reports"
+  },
+  
+  "preprocessing": {
+    "gaussian_blur_sigma": 1.0,
+    "normalize": true,
+    "enhance_contrast": false,
+    "background_correction": true,
+    "noise_threshold": 0.1,
+    "dead_pixel_correction": true,
+    "flat_field_correction": false
+  },
+  
+  "alignment": {
+    "method": "phase_correlation",
+    "reference_frame": "middle",
+    "max_iterations": 100,
+    "convergence_threshold": 1e-6,
+    "sub_pixel_accuracy": true,
+    "interpolation_method": "bilinear",
+    "padding_mode": "constant",
+    "edge_handling": "crop"
+  },
+  
+  "quality_control": {
+    "min_overlap": 0.8,
+    "max_displacement": 50,
+    "correlation_threshold": 0.7,
+    "intensity_variation_threshold": 0.3,
+    "enable_outlier_detection": true,
+    "outlier_method": "z_score",
+    "outlier_threshold": 2.5
+  },
+  
+  "output": {
+    "base_output_dir": "outputs/iqid_aligned/",
+    "intermediate_dir": "intermediate/iqid_alignment/",
+    "logs_dir": "logs/",
+    "reports_dir": "reports/",
+    "readonly_policy": "All outputs written outside readonly UCSF data directory",
+    "save_intermediate": true,
+    "save_individual_frames": false,
+    "save_aligned_stack": true,
+    "save_quality_metrics": true,
+    "output_format": "tiff",
+    "compression": false,
+    "bit_depth": 32,
+    "create_sample_subdirs": true,
+    "preserve_sample_names": true,
+    "create_timestamped_outputs": true
+  },
+  
+  "visualization": {
+    "create_alignment_plots": true,
+    "create_quality_plots": true,
+    "save_preview_images": true,
+    "colormap": "viridis",
+    "figure_dpi": 300,
+    "figure_format": "png",
+    "plot_titles": true,
+    "plot_colorbars": true
+  },
+  
+  "performance": {
+    "use_multiprocessing": false,
+    "n_workers": 4,
+    "memory_limit_gb": 8,
+    "chunk_size": 10
+  },
+  
+  "logging": {
+    "level": "INFO",
+    "save_log": true,
+    "log_file": "logs/iqid_alignment.log",
+    "detailed_timing": true,
+    "create_timestamped_logs": true
+  }
+}

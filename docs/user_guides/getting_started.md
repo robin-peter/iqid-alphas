@@ -324,3 +324,90 @@ For advanced usage and customization, see:
 - [Configuration Guide](configuration.md)
 - [Advanced Usage](advanced_usage.md)
 - [API Reference](../api_reference/)
+
+## Complete UCSF Workflows
+
+For comprehensive analysis of UCSF datasets, we provide complete end-to-end workflows that demonstrate production-ready processing pipelines.
+
+### UCSF Workflow Overview
+
+The UCSF workflows are located in `examples/ucsf_workflows/` and provide:
+
+1. **iQID Raw Data Alignment** - Process raw iQID image stacks to aligned data
+2. **H&E-iQID Co-registration** - Co-register H&E histology with aligned iQID
+3. **Complete Analysis Pipeline** - Orchestrate both workflows with comprehensive reporting
+
+### Quick Start with UCSF Workflows
+
+**Step 1: Navigate to workflows directory**
+```bash
+cd examples/ucsf_workflows
+```
+
+**Step 2: Run complete pipeline**
+```bash
+python run_complete_pipeline.py
+```
+
+**Step 3: Review results**
+```bash
+# Check outputs
+ls outputs/complete_analysis/
+
+# View human-readable summary
+cat outputs/complete_analysis/analysis_summary.txt
+```
+
+### Workflow Details
+
+#### Workflow 1: iQID Alignment
+```bash
+# Run individual iQID alignment workflow
+python workflow1_iqid_alignment.py
+```
+
+**Features:**
+- Automatic quality assessment
+- Sub-pixel accuracy alignment
+- Comprehensive metrics reporting
+- Configurable reference frame selection
+
+#### Workflow 2: H&E-iQID Co-registration
+```bash
+# Run H&E co-registration workflow (requires Workflow 1 output)
+python workflow2_he_iqid_coregistration.py
+```
+
+**Features:**
+- Multi-modal image registration
+- Automatic tissue segmentation
+- Activity quantification per tissue region
+- Publication-quality visualizations
+
+### UCSF Workflow Configuration
+
+**Customize alignment parameters:**
+```json
+// examples/ucsf_workflows/configs/iqid_alignment_config.json
+{
+  "alignment": {
+    "method": "phase_correlation",
+    "reference_frame": "middle",
+    "convergence_threshold": 1e-6
+  }
+}
+```
+
+**Customize analysis parameters:**
+```json
+// examples/ucsf_workflows/configs/he_iqid_config.json
+{
+  "analysis": {
+    "quantify_activity_per_tissue": true,
+    "calculate_dose_metrics": true,
+    "heterogeneity_metrics": ["coefficient_of_variation", "entropy"]
+  }
+}
+```
+
+For detailed UCSF workflow documentation, see [UCSF Workflows Guide](../docs/examples/ucsf_workflows.md).
