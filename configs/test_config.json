@@ -1,0 +1,53 @@
+{
+  "experiment_id": "ucsf_ac225_test",
+  "paths": {
+    "root_data_dir": "../data/UCSF-Collab/",
+    "raw_image_dir": "data/DataPush1/iQID/Sequential/kidneys/D1M1_L/",
+    "segmented_image_dir": "data/ReUpload/iQID_reupload/iQID/Sequential/kidneys/D1M1_L/1_segmented/",
+    "aligned_image_dir": "data/ReUpload/iQID_reupload/iQID/Sequential/kidneys/D1M1_L/2_aligned/",
+    "quantitative_notes_doc": "data/ReUpload/quantitative_notes.docx",
+    "metadata_file": "data/ReUpload/metadata_TJU.csv",
+    "dose_kernel_file": "./test_kernels/ac225_water_10keV_kernel.txt",
+    "output_base_dir": "./test_output/",
+    "processed_data_dir": "./test_output/processed_data/",
+    "aligned_images_dir": "./test_output/aligned_images/",
+    "dose_maps_dir": "./test_output/dose_kernels/",
+    "log_dir": "./test_output/logs/"
+  },
+  "quantitative_corrections": {
+    "decay_correction_enabled": true,
+    "half_life_seconds": 864000,
+    "scanner_calibration_factor": 1.25,
+    "background_subtraction_enabled": true,
+    "deadtime_correction_us": 5.0
+  },
+  "image_processing": {
+    "file_format": "tif",
+    "bit_depth": 16,
+    "binning_factor": 1,
+    "gaussian_filter_sigma": 1.0,
+    "alignment_method": "phase_correlation",
+    "registration_template": "first_image"
+  },
+  "dose_kernel": {
+    "kernel_dimension": 128,
+    "voxel_size_um": 10,
+    "slice_thickness_um": 12,
+    "material_density_kg_m3": 1000,
+    "alpha_decay_count": 1000000
+  },
+  "analysis": {
+    "roi_detection_method": "contour",
+    "min_roi_area_pixels": 100,
+    "gaussian_blur_radius": 15,
+    "threshold_method": "otsu",
+    "temporal_binning_ms": 1000
+  },
+  "output": {
+    "save_intermediate_results": true,
+    "generate_summary_plots": true,
+    "export_roi_data": true,
+    "export_dose_maps": true,
+    "log_level": "INFO"
+  }
+}

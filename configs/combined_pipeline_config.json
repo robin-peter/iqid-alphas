@@ -1,0 +1,37 @@
+{
+  "pipeline_name": "Combined_HE_iQID_Processing",
+  "version": "1.0",
+  "description": "Configuration for combined H&E and iQID processing pipeline (DataPush1 data)",
+  "paths": {
+    "datapush_root": "../data/UCSF-Collab/data/DataPush1",
+    "output_root": "./outputs/combined_he_iqid_processing"
+  },
+  "processing_parameters": {
+    "he_segmentation": {
+      "method": "filled_tissue_mask",
+      "morphology_kernel_size": 5
+    },
+    "iqid_segmentation": {
+      "method": "morphological",
+      "min_size": 50,
+      "watershed_markers": "auto"
+    },
+    "alignment": {
+      "method": "multi_scale",
+      "scales": [
+        2,
+        4,
+        8,
+        16,
+        32,
+        47
+      ],
+      "registration_method": "coarse_to_fine"
+    }
+  },
+  "quality_thresholds": {
+    "min_roi_size": 50,
+    "max_rois_per_sample": 100,
+    "alignment_quality_threshold": 0.8
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "config_files": {
+    "combined_pipeline": {
+      "file": "combined_pipeline_config.json",
+      "description": "Configuration for combined H&E and iQID processing pipeline (DataPush1 data)",
+      "data_type": "DataPush1",
+      "pipeline_type": "combined_he_iqid"
+    },
+    "iqid_only": {
+      "file": "iqid_pipeline_config.json", 
+      "description": "Configuration for iQID-only processing pipeline (ReUpload data)",
+      "data_type": "ReUpload",
+      "pipeline_type": "iqid_only"
+    },
+    "test": {
+      "file": "test_config.json",
+      "description": "Test configuration for UCSF AC-225 experiments",
+      "data_type": "test",
+      "pipeline_type": "test"
+    }
+  }
+}
