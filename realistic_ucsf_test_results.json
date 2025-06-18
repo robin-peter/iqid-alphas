@@ -1,0 +1,23 @@
+{
+  "simple_pipeline": {
+    "status": "success",
+    "processed_file": "mBq_corr_002_D1M1_R.tif",
+    "output_location": "/tmp/tmp04xb_fb1"
+  },
+  "ucsf_workflow": {
+    "status": "failed",
+    "error": "expected str, bytes or os.PathLike object, not dict"
+  },
+  "core_components": {
+    "processor": "success",
+    "segmenter": "success",
+    "image_stats": {
+      "shape": [
+        512,
+        512
+      ],
+      "mean_intensity": 141.81776428222656,
+      "tissue_coverage": 0.0
+    }
+  }
+}

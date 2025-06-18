@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-06-18T04:18:10.021179",
+  "tests_run": 6,
+  "tests_passed": 0,
+  "tests_failed": 6,
+  "errors": [
+    {
+      "test": "format_test_7D-M2-Seq-Kidney-Lower_bce904de-c435-4b6c-a63f-72f1c8a7c203_scene_1of1.tif",
+      "error": "'SimplePipeline' object has no attribute 'run'"
+    }
+  ],
+  "data_found": {
+    "iqid": {
+      "directories": 8,
+      "files": 82,
+      "sample_dirs": [
+        "D1M1_L",
+        "D7M1_L",
+        "D1M1_R",
+        "D1M2_L",
+        "D7M2_L"
+      ],
+      "sample_files": [
+        "mBq_corr_11.tif",
+        "mBq_corr_2.tif",
+        "mBq_corr_1.tif",
+        "mBq_corr_4.tif",
+        "mBq_corr_8.tif",
+        "mBq_corr_6.tif",
+        "mBq_corr_10.tif",
+        "mBq_corr_5.tif",
+        "mBq_corr_0.tif",
+        "mBq_corr_7.tif"
+      ]
+    },
+    "he": {
+      "files": 20,
+      "sample_files": [
+        "D1-M1-Seq-Kidney-Upper_c820cf62-844f-485e-bcdd-7c12af7eef9d_scene_1of2.tif",
+        "7D-M2-Seq-Kidney-Lower_bce904de-c435-4b6c-a63f-72f1c8a7c203_scene_1of1.tif",
+        "D1-M2-Seq-Kidney-Lower_5867ae39-2a25-4483-98fb-fcf8a3e043ea_scene_1of2.tif",
+        "D1-M2-Seq-Kidney-Upper_eccc7ad4-1915-431d-8c29-c97f5fe0f336_scene_2of2.tif",
+        "D1-M2-Seq-Kidney-Upper_eccc7ad4-1915-431d-8c29-c97f5fe0f336_scene_1of2.tif",
+        "7D-M1-Seq-Tumor-Lower_1f210539-fbe7-497a-8711-0ee2b7c60483_scene_1of1.tif",
+        "7D-M1-Seq-Kidney-Lower_c44f27f4-c27a-4c41-84a3-5a4fba459512_scene_1of2.tif",
+        "7D-M1-Seq-Kidney-Upper_7cd96fc2-3f5b-4c2d-9886-81a9c45a03fa_scene_1of1.tif",
+        "D1-M1-Seq-Lower_d15908f0-99c7-48de-834a-c7fd125d0bcf_scene_1of1.tif",
+        "7D-M1-Seq-Kidney-Lower_c44f27f4-c27a-4c41-84a3-5a4fba459512_scene_2of2.tif"
+      ]
+    },
+    "reupload": {
+      "files": 684,
+      "sample_files": [
+        "0_D1M1K_iqid_event_image.tif",
+        "mBq_corr_11.tif",
+        "mBq_corr_2.tif",
+        "mBq_corr_1.tif",
+        "mBq_corr_4.tif",
+        "mBq_corr_8.tif",
+        "mBq_corr_6.tif",
+        "mBq_corr_10.tif",
+        "mBq_corr_5.tif",
+        "mBq_corr_0.tif"
+      ]
+    }
+  },
+  "pipeline_results": {},
+  "performance_metrics": {},
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 0,
+    "failed_tests": 6,
+    "success_rate_percent": 0.0,
+    "data_directories_found": 3,
+    "total_errors": 1
+  }
+}
