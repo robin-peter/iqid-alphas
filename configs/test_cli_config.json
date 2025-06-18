@@ -1,0 +1,29 @@
+{
+  "processing": {
+    "normalize": true,
+    "remove_outliers": true,
+    "gaussian_filter": true,
+    "filter_sigma": 1.0
+  },
+  "segmentation": {
+    "method": "otsu",
+    "min_size": 100,
+    "remove_small_objects": true
+  },
+  "alignment": {
+    "method": "phase_correlation",
+    "max_shift": 50,
+    "subpixel_precision": true
+  },
+  "visualization": {
+    "save_plots": true,
+    "output_dir": "results",
+    "dpi": 300,
+    "format": "png"
+  },
+  "quality_control": {
+    "enable_validation": true,
+    "min_alignment_score": 0.5,
+    "max_processing_time": 300
+  }
+}

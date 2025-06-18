@@ -1,0 +1,15 @@
+{
+  "processed": 2,
+  "success": 0,
+  "failed": 2,
+  "errors": [
+    "Failed to process 11: 'SimplePipeline' object has no attribute 'process'",
+    "Failed to process 2: 'SimplePipeline' object has no attribute 'process'"
+  ],
+  "summary": {
+    "start_time": "2025-06-18T12:39:10.157213",
+    "end_time": "2025-06-18T12:39:10.171634",
+    "duration_seconds": 0.014421,
+    "success_rate": 0.0
+  }
+}

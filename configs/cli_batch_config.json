@@ -1,0 +1,40 @@
+{
+  "processing": {
+    "normalize": true,
+    "remove_outliers": true,
+    "gaussian_filter": true,
+    "filter_sigma": 1.0,
+    "noise_reduction": true
+  },
+  "segmentation": {
+    "method": "otsu",
+    "min_size": 100,
+    "remove_small_objects": true,
+    "dilation_radius": 2
+  },
+  "alignment": {
+    "method": "phase_correlation",
+    "max_shift": 50,
+    "subpixel_precision": true,
+    "quality_threshold": 0.5
+  },
+  "visualization": {
+    "save_plots": true,
+    "output_dir": "results/batch_processing",
+    "dpi": 300,
+    "format": "png",
+    "create_summary": true
+  },
+  "quality_control": {
+    "enable_validation": true,
+    "min_alignment_score": 0.5,
+    "max_processing_time": 300,
+    "save_quality_metrics": true
+  },
+  "batch_processing": {
+    "parallel_processing": false,
+    "chunk_size": 10,
+    "progress_reporting": true,
+    "error_handling": "continue"
+  }
+}

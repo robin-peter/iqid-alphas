@@ -1,0 +1,25 @@
+{
+  "processing": {
+    "normalize": true,
+    "remove_outliers": false,
+    "gaussian_filter": false
+  },
+  "segmentation": {
+    "method": "otsu",
+    "min_size": 50
+  },
+  "alignment": {
+    "method": "phase_correlation",
+    "max_shift": 30
+  },
+  "visualization": {
+    "save_plots": true,
+    "output_dir": "results/quick_test",
+    "dpi": 150,
+    "format": "png"
+  },
+  "quality_control": {
+    "enable_validation": false,
+    "max_processing_time": 60
+  }
+}
