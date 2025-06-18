@@ -1,0 +1,30 @@
+{
+  "validation_timestamp": "2025-06-18T02:54:50.074671",
+  "setup_validation": true,
+  "data_availability": true,
+  "individual_path_tests": {
+    "path1": {
+      "status": "completed",
+      "duration": 0.0013949871063232422,
+      "steps_completed": 5,
+      "success": true
+    },
+    "path2": {
+      "status": "failed",
+      "error": "'aligned_iqid'",
+      "success": false
+    }
+  },
+  "complete_workflow_test": {
+    "status": "failed",
+    "error": "'aligned_iqid'",
+    "success": false
+  },
+  "output_structure_validation": {
+    "intermediate": true,
+    "outputs": true,
+    "logs": true,
+    "reports": true
+  },
+  "overall_success": false
+}

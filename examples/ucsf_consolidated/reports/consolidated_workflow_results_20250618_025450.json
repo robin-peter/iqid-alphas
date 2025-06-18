@@ -1,0 +1,38 @@
+{
+  "workflow_type": "ucsf_consolidated",
+  "start_time": "2025-06-18T02:54:50.071931",
+  "data_available": true,
+  "path1_results": {
+    "workflow": "path1_iqid_raw_to_aligned",
+    "start_time": "2025-06-18T02:54:50.072074",
+    "input_paths": {
+      "3d_scans": "../data/UCSF-Collab/data/ReUpload/iQID_reupload/3D scans/",
+      "sequential_scans": "../data/UCSF-Collab/data/ReUpload/iQID_reupload/Sequential scans/"
+    },
+    "intermediate_dir": "/home/wxc151/iqid-alphas/examples/ucsf_consolidated/configs/../intermediate/path1_iqid_alignment",
+    "output_dir": "/home/wxc151/iqid-alphas/examples/ucsf_consolidated/configs/../outputs/path1_aligned_iqid",
+    "steps_completed": [
+      "load_raw_iqid",
+      "preprocess_frames",
+      "align_sequences",
+      "quality_assessment",
+      "save_aligned_data"
+    ],
+    "processing_stats": {
+      "raw_data_loaded": 1,
+      "quality_metrics": {
+        "alignment_score": 0.85,
+        "temporal_consistency": 0.92,
+        "spatial_registration": 0.88,
+        "files_processed": 1
+      }
+    },
+    "status": "completed",
+    "end_time": "2025-06-18T02:54:50.073302"
+  },
+  "path2_results": null,
+  "visualization_results": null,
+  "overall_status": "failed",
+  "error": "'aligned_iqid'",
+  "end_time": "2025-06-18T02:54:50.073484"
+}

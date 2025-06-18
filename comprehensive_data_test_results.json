@@ -1,0 +1,362 @@
+{
+  "simple_pipeline": {
+    "iqid_2d": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "iqid_3d_temporal": {
+      "status": "success",
+      "details": "Processed 10 slices"
+    },
+    "iqid_hires": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "he_rgb": {
+      "status": "success",
+      "details": "Processed 512 slices"
+    },
+    "he_gray": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "iqid_low_snr": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "iqid_hdr": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "iqid_8bit": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "iqid_32bit": {
+      "status": "success",
+      "details": "Processed 1 slices"
+    },
+    "iqid_misaligned": {
+      "status": "success",
+      "details": "Processed 5 slices"
+    }
+  },
+  "core_components": {
+    "processor": {
+      "iqid_2d": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 2047.9964065551758
+      },
+      "iqid_3d_temporal": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 2048.3665462493896
+      },
+      "iqid_hires": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 2046.0456686019897
+      },
+      "he_rgb": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 127.01472727457683
+      },
+      "he_gray": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 126.89111709594727
+      },
+      "iqid_low_snr": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 70.90946960449219
+      },
+      "iqid_hdr": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 32781.865058898926
+      },
+      "iqid_8bit": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 126.92132568359375
+      },
+      "iqid_32bit": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 500121.9182739258
+      },
+      "iqid_misaligned": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 2043.3487548828125
+      },
+      "multimodal": {
+        "preprocessing": "success",
+        "analysis_keys": [
+          "mean_intensity",
+          "std_intensity",
+          "min_intensity",
+          "max_intensity",
+          "total_intensity",
+          "image_shape",
+          "image_size",
+          "image_dtype",
+          "roi_area",
+          "roi_mean_intensity",
+          "roi_total_intensity"
+        ],
+        "mean_intensity": 2043.3487548828125
+      }
+    },
+    "segmenter": {
+      "iqid_2d": {
+        "tissue_coverage": 0,
+        "num_regions": 104,
+        "activity_detected": "True"
+      },
+      "iqid_3d_temporal": {
+        "tissue_coverage": 0,
+        "num_regions": 94,
+        "activity_detected": "True"
+      },
+      "iqid_hires": {
+        "tissue_coverage": 0,
+        "num_regions": 420,
+        "activity_detected": "True"
+      },
+      "he_rgb": {
+        "tissue_coverage": 0,
+        "num_regions": 0,
+        "activity_detected": "False"
+      },
+      "he_gray": {
+        "tissue_coverage": 0,
+        "num_regions": 99,
+        "activity_detected": "True"
+      },
+      "iqid_low_snr": {
+        "tissue_coverage": 0,
+        "num_regions": 2,
+        "activity_detected": "True"
+      },
+      "iqid_hdr": {
+        "tissue_coverage": 0,
+        "num_regions": 98,
+        "activity_detected": "False"
+      },
+      "iqid_8bit": {
+        "tissue_coverage": 0,
+        "num_regions": 23,
+        "activity_detected": "True"
+      },
+      "iqid_32bit": {
+        "tissue_coverage": 0,
+        "num_regions": 28,
+        "activity_detected": "True"
+      },
+      "iqid_misaligned": {
+        "tissue_coverage": 0,
+        "num_regions": 22,
+        "activity_detected": "False"
+      },
+      "multimodal": {
+        "tissue_coverage": 0,
+        "num_regions": 22,
+        "activity_detected": "False"
+      }
+    },
+    "aligner": {
+      "misaligned_stack": {
+        "num_aligned": 4,
+        "avg_correlation": 0.0
+      }
+    },
+    "visualizer": {
+      "iqid_2d": {
+        "plot_created": true
+      },
+      "iqid_hdr": {
+        "plot_created": true
+      },
+      "iqid_low_snr": {
+        "plot_created": true
+      }
+    }
+  },
+  "robustness": {
+    "empty_image": {
+      "handled": true,
+      "status": "failed"
+    },
+    "single_pixel": {
+      "handled": true,
+      "status": "failed"
+    },
+    "very_large": {
+      "handled": true,
+      "status": "failed"
+    },
+    "negative_values": {
+      "handled": true,
+      "status": "failed"
+    },
+    "nan_values": {
+      "handled": true,
+      "status": "failed"
+    },
+    "inf_values": {
+      "handled": true,
+      "status": "failed"
+    },
+    "mixed_data": {
+      "handled": true,
+      "status": "failed"
+    }
+  },
+  "format_compatibility": {
+    "numpy": {
+      "created": true,
+      "size": 131200
+    },
+    "tiff": {
+      "created": true,
+      "size": 131328
+    },
+    "png": {
+      "created": true,
+      "size": 65917
+    },
+    "jpeg": {
+      "created": true,
+      "size": 36439
+    }
+  },
+  "summary": {
+    "total_tests": 25,
+    "successful_tests": 25,
+    "success_rate": 100.0
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "validation_timestamp": "2025-06-18T01:29:43.635501",
+  "setup_validation": true,
+  "data_availability": true,
+  "individual_path_tests": {
+    "path1": {
+      "status": "completed",
+      "duration": 0.001470327377319336,
+      "steps_completed": 5,
+      "success": true
+    },
+    "path2": {
+      "status": "failed",
+      "error": "'aligned_iqid'",
+      "success": false
+    }
+  },
+  "complete_workflow_test": {
+    "status": "failed",
+    "error": "[Errno 2] No such file or directory: '/home/wxc151/iqid-alphas/examples/ucsf_consolidated/configs/../reports/consolidated_workflow_results_20250618_012943.json'",
+    "success": false
+  },
+  "output_structure_validation": {
+    "intermediate": true,
+    "outputs": true,
+    "logs": true,
+    "reports": false
+  },
+  "overall_success": false
+}
