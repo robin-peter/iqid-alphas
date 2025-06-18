@@ -9,7 +9,8 @@ from typing import Tuple, Dict, Any, Optional
 import warnings
 
 try:
-    from skimage import transform, feature, measure
+    from skimage import transform, measure # feature might not be needed if using phase_cross_correlation
+    from skimage.registration import phase_cross_correlation # More modern way
     from scipy import ndimage
     HAS_IMAGING = True
 except ImportError:
@@ -69,24 +70,36 @@ class ImageAligner:
             if len(moving.shape) > 2:
                 moving = np.mean(moving, axis=2)
             
-            # Compute phase correlation
-            shift, error, diffphase = feature.register_translation(fixed, moving)
+            # Compute phase correlation using phase_cross_correlation
+            # For scikit-image >= 0.19, it returns (shifts, error, phasediff) when upsample_factor > 1
+            # For scikit-image < 0.19 or basic usage, it might just return shifts.
+            # Let's try without return_error and see if it returns three values with upsample_factor.
+            # If not, we'll need to adjust.
+            result = phase_cross_correlation(fixed, moving, upsample_factor=10)
+            if isinstance(result, tuple) and len(result) == 3:
+                shift, error, diffphase = result
+            else: # Assuming it just returned shifts
+                shift = result
+                error, diffphase = None, None # Or some default/calculated values if needed
+            # shift is (dy, dx)
             
             # Apply transformation
-            aligned = ndimage.shift(moving, shift)
+            aligned = ndimage.shift(moving, shift) # ndimage.shift expects (dy, dx)
             
             transformation = {
                 'method': 'phase_correlation',
-                'shift': shift.tolist(),
-                'error': float(error),
-                'translation_x': float(shift[1]),
-                'translation_y': float(shift[0])
+                'shift': shift.tolist(), # shift is already [dy, dx]
+                'error': float(error) if error is not None else None, # error from phase_cross_correlation
+                'phasediff': float(diffphase) if diffphase is not None else None, # phasediff from phase_cross_correlation
+                'translation_x': float(shift[1]), # dx
+                'translation_y': float(shift[0])  # dy
             }
             
             return aligned, transformation
             
         except Exception as e:
-            print(f"Phase correlation failed: {e}, using simple alignment")
+            # Catch specific error if phase_cross_correlation is not found due to version, or general errors
+            print(f"Phase correlation with phase_cross_correlation failed: {e}, using simple alignment")
             return self._simple_translation_alignment(fixed, moving)
     
     def _simple_translation_alignment(self, fixed: np.ndarray, moving: np.ndarray) -> Tuple[np.ndarray, Dict[str, Any]]:

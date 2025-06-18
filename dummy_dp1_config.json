@@ -1,0 +1,27 @@
+{
+  "comment": "Dummy config for DataPush1 E2E testing",
+  "processing": {
+    "normalize": true,
+    "gaussian_blur_sigma": 0.5
+  },
+  "segmentation": {
+    "method": "otsu",
+    "min_tissue_area": 10,
+    "min_activity_area": 5,
+    "tissue_method": "adaptive",
+    "activity_method": "otsu"
+  },
+  "alignment": {
+    "method": "phase_correlation"
+  },
+  "output": {
+    "save_aligned_images": true,
+    "create_overlay_plots": false,
+    "generate_combined_report": false,
+    "create_comprehensive_plots": false,
+    "generate_report": false
+  },
+  "visualization": {
+    "save_plots": false
+  }
+}

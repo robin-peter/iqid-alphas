@@ -1,15 +1,10 @@
-"""
-Combined Pipeline for H&E and iQID Analysis
-
-Pipeline for processing paired H&E histology and iQID activity images
-with alignment and combined analysis.
-"""
-
 import os
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
 import numpy as np
+import logging # Added: import logging
+import sys # Added: import sys for StreamHandler
 
 from ..core.processor import IQIDProcessor
 from ..core.segmentation import ImageSegmenter
@@ -43,6 +38,20 @@ class CombinedPipeline:
         self.segmenter = ImageSegmenter()
         self.aligner = ImageAligner()
         self.visualizer = Visualizer()
+        self.logger = self._setup_logger() # Added logger
+
+    def _setup_logger(self) -> logging.Logger:
+        # Basic logger for pipeline, can be expanded
+        # import logging # No longer needed here
+        # import sys # No longer needed here
+        logger = logging.getLogger(self.__class__.__name__)
+        if not logger.handlers: # Avoid duplicate handlers
+            logger.setLevel(logging.INFO) # Now logging.INFO is accessible
+            handler = logging.StreamHandler(sys.stdout)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+        return logger
         
     def _default_config(self) -> Dict[str, Any]:
         """Get default configuration for combined pipeline."""
@@ -86,7 +95,7 @@ class CombinedPipeline:
         Dict[str, Any]
             Combined processing results
         """
-        print(f"Combined processing: H&E={Path(he_path).name}, iQID={Path(iqid_path).name}")
+        self.logger.info(f"Combined processing: H&E={Path(he_path).name}, iQID={Path(iqid_path).name}")
         
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
@@ -95,7 +104,9 @@ class CombinedPipeline:
             'he_file': he_path,
             'iqid_file': iqid_path,
             'output_dir': output_dir,
-            'pipeline': 'combined'
+            'pipeline': 'combined',
+            'status': 'success', # Default to success
+            'error': None
         }
         
         try:
@@ -145,31 +156,61 @@ class CombinedPipeline:
             results['analysis'] = cross_modal_analysis
             
             # Step 5: Create combined visualizations
-            if self.config['output']['create_overlay_plots']:
-                fig = self.visualizer.create_overlay_plot(
-                    he_image=he_processed,
-                    iqid_image=aligned_iqid,
-                    tissue_mask=tissue_mask,
-                    activity_mask=activity_mask,
-                    title="Combined H&E + iQID Analysis"
-                )
-                
-                plot_file = output_path / f"combined_analysis.png"
-                fig.savefig(plot_file, dpi=300, bbox_inches='tight')
-                results['visualization'] = {'overlay_plot': str(plot_file)}
+            output_config = self.config.get('output', {})
+            # visualization_config = self.config.get('visualization', {}) # output_dir is now passed to save_figure
+
+            if output_config.get('create_overlay_plots', True): # Default to True if not specified
+                plot_paths = []
+                try:
+                    # Plot iQID with activity mask
+                    fig_iqid, _ = self.visualizer.plot_segmentation_overlay(
+                        image=aligned_iqid,
+                        segments=activity_mask,
+                        alpha=0.5,
+                        title=f"iQID with Activity Mask - {Path(iqid_path).name}"
+                    )
+                    iqid_plot_file = output_path / f"{Path(iqid_path).stem}_activity_overlay.png"
+                    self.visualizer.save_figure(str(iqid_plot_file)) # Uses self.visualizer.current_figure
+                    plot_paths.append(str(iqid_plot_file))
+                    self.visualizer.close() # Close figure
+
+                    # Plot H&E with tissue mask
+                    fig_he, _ = self.visualizer.plot_segmentation_overlay(
+                        image=he_processed,
+                        segments=tissue_mask,
+                        alpha=0.5,
+                        title=f"H&E with Tissue Mask - {Path(he_path).name}"
+                    )
+                    he_plot_file = output_path / f"{Path(he_path).stem}_tissue_overlay.png"
+                    self.visualizer.save_figure(str(he_plot_file))
+                    plot_paths.append(str(he_plot_file))
+                    self.visualizer.close()
+
+                    results['visualization'] = {'overlay_plots': plot_paths}
+                except Exception as e_vis:
+                    self.logger.warning(f"Visualization failed during CombinedPipeline: {e_vis}")
+                    results['visualization'] = {'error': str(e_vis)}
             
             # Step 6: Save aligned images
-            if self.config['output']['save_aligned_images']:
-                aligned_file = output_path / f"aligned_iqid.png"
+            if output_config.get('save_aligned_images', True): # Default to True
+                aligned_file = output_path / f"aligned_iqid.png" # output_path is sample specific from CLI
                 try:
-                    import matplotlib.pyplot as plt
-                    plt.imsave(aligned_file, aligned_iqid, cmap='viridis')
+                    # Ensure aligned_iqid is in a savable format (e.g., convert float to uint16 if appropriate)
+                    saveable_aligned_iqid = aligned_iqid.copy()
+                    if np.issubdtype(saveable_aligned_iqid.dtype, np.floating):
+                         saveable_aligned_iqid = (saveable_aligned_iqid / np.max(saveable_aligned_iqid) * 255).astype(np.uint8) # Example scaling
+                    # import matplotlib.pyplot as plt # Not needed if using skimage.io.imsave
+                    # plt.imsave(aligned_file, saveable_aligned_iqid, cmap='viridis')
+                    skimage.io.imsave(str(aligned_file), saveable_aligned_iqid, plugin='tifffile', check_contrast=False)
+
                     results['aligned_iqid_file'] = str(aligned_file)
-                except Exception:
-                    pass
+                except Exception as e_save_align:
+                    self.logger.warning(f"Failed to save aligned iQID image: {e_save_align}")
+                    if 'files_saved' not in results: results['files_saved'] = {}
+                    results['files_saved']['aligned_iqid_error'] = str(e_save_align)
             
             # Step 7: Generate combined report
-            if self.config['output']['generate_combined_report']:
+            if output_config.get('generate_combined_report', True): # Default to True
                 report = self._generate_combined_report(results)
                 report_file = output_path / "combined_report.html"
                 with open(report_file, 'w') as f:
@@ -181,13 +222,12 @@ class CombinedPipeline:
             with open(results_file, 'w') as f:
                 json.dump(results, f, indent=2, default=str)
             
-            results['status'] = 'success'
-            print("✓ Combined processing complete")
+            self.logger.info("✓ Combined processing complete")
             
         except Exception as e:
             results['status'] = 'failed'
             results['error'] = str(e)
-            print(f"✗ Combined processing failed: {e}")
+            self.logger.error(f"✗ Combined processing failed: {e}")
         
         return results
     
@@ -304,7 +344,7 @@ class CombinedPipeline:
                 <h1>Combined H&E + iQID Analysis Report</h1>
                 <p><strong>H&E File:</strong> {results.get('he_file', 'Unknown')}</p>
                 <p><strong>iQID File:</strong> {results.get('iqid_file', 'Unknown')}</p>
-                <p><strong>Status:</strong> <span class="success">{results.get('status', 'Unknown')}</span></p>
+                <p><strong>Status:</strong> <span class="{results.get('status', 'Unknown')}">{results.get('status', 'Unknown')}</span></p>
             </div>
             
             <div class="section">

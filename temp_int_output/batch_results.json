@@ -1,0 +1,12 @@
+{
+  "processed": 1,
+  "success": 1,
+  "failed": 0,
+  "errors": [],
+  "summary": {
+    "start_time": "2025-06-18T15:51:39.316228",
+    "end_time": "2025-06-18T15:51:39.343830",
+    "duration_seconds": 0.027602,
+    "success_rate": 100.0
+  }
+}

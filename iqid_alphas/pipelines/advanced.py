@@ -1,19 +1,13 @@
-"""
-Advanced Pipeline for Comprehensive iQID Analysis
-
-Advanced pipeline with full feature set including detailed analysis,
-quality metrics, and comprehensive reporting.
-"""
-
 import os
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
 import numpy as np
+import logging # Added: import logging
+import sys # Added: import sys for StreamHandler
 
 from ..core.processor import IQIDProcessor
 from ..core.segmentation import ImageSegmenter
-from ..core.alignment import ImageAligner
 from ..visualization.plotter import Visualizer
 
 
@@ -42,11 +36,24 @@ class AdvancedPipeline:
         self.processor = IQIDProcessor()
         self.segmenter = ImageSegmenter()
         self.visualizer = Visualizer()
+        self.logger = self._setup_logger() # Added logger
+
+    def _setup_logger(self) -> logging.Logger:
+        # Basic logger for pipeline, can be expanded
+        # import logging # No longer needed here, moved to top-level
+        logger = logging.getLogger(self.__class__.__name__)
+        if not logger.handlers: # Avoid duplicate handlers if already configured
+            logger.setLevel(logging.INFO) # Now logging.INFO is accessible
+            handler = logging.StreamHandler(sys.stdout)
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            logger.addHandler(handler)
+        return logger
         
     def _default_config(self) -> Dict[str, Any]:
         """Get default configuration for advanced pipeline."""
         return {
-            'preprocessing': {
+            'processing': {
                 'gaussian_blur_sigma': 1.0,
                 'normalize': True,
                 'enhance_contrast': True,
@@ -87,7 +94,7 @@ class AdvancedPipeline:
         Dict[str, Any]
             Comprehensive processing results
         """
-        print(f"Advanced processing: {image_path}")
+        self.logger.info(f"Advanced processing: {image_path}")
         
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
@@ -96,7 +103,9 @@ class AdvancedPipeline:
             'input_file': image_path,
             'output_dir': output_dir,
             'pipeline': 'advanced',
-            'config': self.config
+            'config': self.config,
+            'status': 'success', # Default to success
+            'error': None
         }
         
         try:
@@ -106,7 +115,7 @@ class AdvancedPipeline:
             # Advanced preprocessing
             processed_image = self.processor.preprocess_image(
                 image, 
-                **self.config['preprocessing']
+                **self.config.get('processing', self.config.get('preprocessing', {})) # Use 'processing' or fallback to 'preprocessing'
             )
             
             results['preprocessing'] = {
@@ -116,17 +125,26 @@ class AdvancedPipeline:
             }
             
             # Step 2: Advanced segmentation
-            tissue_segmenter = ImageSegmenter(self.config['segmentation']['tissue_method'])
-            activity_segmenter = ImageSegmenter(self.config['segmentation']['activity_method'])
+            segmentation_config = self.config.get('segmentation', {})
+            tissue_method = segmentation_config.get('tissue_method', 'adaptive') # Default from _default_config
+            activity_method = segmentation_config.get('activity_method', 'otsu') # Default from _default_config
+            min_tissue_area = segmentation_config.get('min_tissue_area', 500) # Default
+            min_activity_area = segmentation_config.get('min_activity_area', 50) # Default
+            morphological_cleanup = segmentation_config.get('morphological_cleanup', True) # Default
+
+            tissue_segmenter = ImageSegmenter(tissue_method)
+            activity_segmenter = ImageSegmenter(activity_method)
             
             tissue_mask = tissue_segmenter.segment_tissue(
                 processed_image,
-                min_size=self.config['segmentation']['min_tissue_area']
+                min_size=min_tissue_area,
+                morphological_closing=morphological_cleanup # Pass relevant cleanup args
             )
             
             activity_mask = activity_segmenter.segment_activity(
                 processed_image,
-                min_activity_size=self.config['segmentation']['min_activity_area']
+                min_activity_size=min_activity_area,
+                morphological_closing=morphological_cleanup # Pass relevant cleanup args
             )
             
             results['segmentation'] = {
@@ -154,22 +172,54 @@ class AdvancedPipeline:
             }
             
             # Step 4: Advanced visualization
-            if self.config['output']['create_comprehensive_plots']:
-                # Create comprehensive visualization
-                fig = self.visualizer.create_comprehensive_plot(
-                    original_image=image,
-                    processed_image=processed_image,
-                    tissue_mask=tissue_mask,
-                    activity_mask=activity_mask,
-                    title=f"Advanced Analysis: {Path(image_path).name}"
-                )
-                
-                plot_file = output_path / f"{Path(image_path).stem}_comprehensive.png"
-                fig.savefig(plot_file, dpi=300, bbox_inches='tight')
-                results['visualization'] = {'comprehensive_plot': str(plot_file)}
+            output_specific_config = self.config.get('output', {})
+            # visualization_config = self.config.get('visualization', {}) # output_dir is now in output_path
+
+            if output_specific_config.get('create_comprehensive_plots', True):
+                plot_paths = []
+                base_plot_name = Path(image_path).stem
+                try:
+                    # 1. Processed image activity map
+                    self.visualizer.plot_activity_map(
+                        processed_image,
+                        title=f"Processed Image - {base_plot_name}"
+                    )
+                    proc_plot_file = output_path / f"{base_plot_name}_processed_map.png"
+                    self.visualizer.save_figure(str(proc_plot_file))
+                    plot_paths.append(str(proc_plot_file))
+                    self.visualizer.close()
+
+                    # 2. Tissue mask overlay
+                    self.visualizer.plot_segmentation_overlay(
+                        processed_image,
+                        tissue_mask,
+                        alpha=0.5,
+                        title=f"Tissue Mask Overlay - {base_plot_name}"
+                    )
+                    tissue_plot_file = output_path / f"{base_plot_name}_tissue_overlay.png"
+                    self.visualizer.save_figure(str(tissue_plot_file))
+                    plot_paths.append(str(tissue_plot_file))
+                    self.visualizer.close()
+
+                    # 3. Activity mask overlay
+                    self.visualizer.plot_segmentation_overlay(
+                        processed_image,
+                        activity_mask,
+                        alpha=0.5,
+                        title=f"Activity Mask Overlay - {base_plot_name}"
+                    )
+                    activity_plot_file = output_path / f"{base_plot_name}_activity_overlay.png"
+                    self.visualizer.save_figure(str(activity_plot_file))
+                    plot_paths.append(str(activity_plot_file))
+                    self.visualizer.close()
+
+                    results['visualization'] = {'plots': plot_paths}
+                except Exception as e_vis:
+                    self.logger.warning(f"Visualization failed in AdvancedPipeline: {e_vis}")
+                    results['visualization'] = {'error': str(e_vis)}
             
             # Step 5: Generate comprehensive report
-            if self.config['output']['generate_report']:
+            if output_specific_config.get('generate_report', True): # Default true
                 report = self._generate_report(results)
                 report_file = output_path / f"{Path(image_path).stem}_report.html"
                 with open(report_file, 'w') as f:
@@ -181,13 +231,12 @@ class AdvancedPipeline:
             with open(results_file, 'w') as f:
                 json.dump(results, f, indent=2, default=str)
             
-            results['status'] = 'success'
-            print(f"✓ Advanced processing complete: {Path(image_path).name}")
+            self.logger.info(f"✓ Advanced processing complete: {Path(image_path).name}")
             
         except Exception as e:
             results['status'] = 'failed'
             results['error'] = str(e)
-            print(f"✗ Advanced processing failed: {Path(image_path).name} - {e}")
+            self.logger.error(f"✗ Advanced processing failed: {Path(image_path).name} - {e}")
         
         return results
     

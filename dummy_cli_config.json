@@ -1,0 +1,14 @@
+{
+  "processing": {
+    "normalize": true
+  },
+  "segmentation": {
+    "method": "otsu"
+  },
+  "alignment": {
+    "method": "phase_correlation"
+  },
+  "visualization": {
+    "save_plots": false
+  }
+}
