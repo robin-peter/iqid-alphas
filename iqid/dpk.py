@@ -66,15 +66,15 @@ def mev_to_mgy(kernel, vox_vol_m, dens_kgm=1e3):
 def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
     """Radially averages a Monte Carlo dose kernel to reduce variance.
 
-    Can return either the radially averaged whole kernel (3D) for convolution
-    or a radial segment (1D) for model analysis.
+    Can return either the radially averaged whole kernel (3D) for convolution,
+    a radial segment (1D) for model analysis, or a sum ring for model analysis.
 
     Parameters
     ----------
     kernel : array_like, shape (N, N, N)
         The input kernel
 
-    mode : str, "whole" or "segment"
+    mode : str, "whole", "segment", or "ring"
         Choice of mode, 3D avg kernel or 1D avg segment
 
     bin_size : float
@@ -82,12 +82,13 @@ def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
 
     Returns
     -------
-    radial_avg : array_like, shape (N, N, N) OR (N//2)
+    radial_avg : array_like, shape (N, N, N) OR (sqrt(3) * N // 2)
         The radially averaged kernel or segment
+        Note segment length is half the cube diagonal
     """
 
-    if mode != 'whole' and mode != 'segment':
-        print('Unsupported mode. Please select 3D "whole" or 1D "segment".')
+    if mode != 'whole' and mode != 'segment' and mode !='ring':
+        print('Unsupported mode. Please select 3D "whole" or 1D "segment" or "ring".')
         return (None)
 
     centerpt = len(kernel)//2
@@ -104,12 +105,14 @@ def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
 
     segment_avg_rad = np.zeros(len(rad))
     kernel_avg_rad = np.zeros_like(kernel)
+    ring_sum_rad = np.zeros(len(rad))
     idx = 0
 
     for i in rad:
         mask = (np.greater(R, i-bin_size) & np.less(R, i+bin_size))
         values = kernel[mask]
         segment_avg_rad[idx] = np.mean(values)
+        ring_sum_rad[idx] = np.sum(values)
         kernel_avg_rad[mask] = np.mean(values)
         idx += 1
 
@@ -117,6 +120,8 @@ def radial_avg_kernel(kernel, mode="whole", bin_size=0.5):
         return (kernel_avg_rad)
     elif mode == 'segment':
         return (segment_avg_rad)
+    elif mode == 'ring':
+        return(ring_sum_rad)
     else:
         return (None)
 
@@ -214,3 +219,37 @@ def fr_corr_ac(framerate):
     pf = 0.25 / (0.25 + 0.25 + 0.25 + pa)
     out = 1 + pd * pf
     return out, pd, pf
+
+
+def convolve_stack(activity_stack, mgy_kernel, num_slices=10):
+    """DPK convolution of a 2D activity stack using the slice-cloning method.
+
+    For each 2D activity slice, the image is cloned into a mini 3D stack,
+    convolved with the 3D dose kernel, and the central z-plane is extracted
+    as the dose estimate for that slice position.
+
+    Parameters
+    ----------
+    activity_stack : ndarray, shape (N, H, W)
+        Activity stack in Bq per pixel, with all efficiency corrections
+        already applied by the caller.
+    mgy_kernel : ndarray, shape (D, Ky, Kx)
+        Dose-point kernel in mGy per Bq·s, already binned to image voxel size.
+    num_slices : int
+        Number of cloned copies used to pad each slice in z (default 10).
+
+    Returns
+    -------
+    dslice_mGyh : ndarray, shape (N, H, W)
+        Dose-rate stack in mGy/h.
+    """
+    from scipy.ndimage import convolve
+    from tqdm import trange
+
+    dslice_mGyh = np.zeros_like(activity_stack)
+    for i in trange(len(activity_stack), desc="Convolving stack"):
+        duped_stack = np.repeat(activity_stack[i][np.newaxis, :, :], num_slices, axis=0)
+        mgy_per_hr = convolve(duped_stack, mgy_kernel) * 3600
+        dslice_mGyh[i] = mgy_per_hr[len(mgy_per_hr) // 2]
+
+    return dslice_mGyh

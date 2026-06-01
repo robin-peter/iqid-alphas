@@ -4,9 +4,10 @@ import glob
 from pathlib import Path
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from tqdm import trange
+
+from pandas import isna
 
 
 
@@ -72,9 +73,9 @@ def natural_sort(l):
 
 def mean_stdev(array, return_vals=False):
     """Simple function to print the mean and stdev of an array to 2 sigfigs."""
-    print('{:.2f} +/- {:.2f}'.format(np.mean(array), np.std(array)))
+    print('{:.2f} +/- {:.2f}'.format(np.nanmean(array), np.nanstd(array)))
     if return_vals:
-        return np.mean(array), np.std(array)
+        return np.nanmean(array), np.nanstd(array)
     else:
         return ''
 
@@ -108,6 +109,10 @@ def get_dt(t1, t2, grain='us', verbose=False):
     dt : Time between events
 
     """
+
+    # handle nan values
+    if isna(t1) or isna(t2):
+        return np.nan
 
     # find dt between two datetime.datetime objects
     dt = min(np.abs(t1 - t2), np.abs(-(t1 - t2)))
@@ -199,176 +204,37 @@ def decompose_affine(A):
     return T, R, Z, S
 
 
-# ---------------------------- PLOTTING FUNCTIONS ---------------------------- #
+def com(im):
+    # calculate the center of mass of an image
+    m = im / np.sum(im)
+
+    # marginal distributions
+    dx = np.sum(m, 0)
+    dy = np.sum(m, 1)
+
+    (X, Y) = im.shape
+    # # expected values
+    cx = np.sum(dx * np.arange(X))
+    cy = np.sum(dy * np.arange(Y))
+
+    return cx, cy
 
 
-def set_plot_parms():
-    """The standard set of plt parameters that I like.
-    It is also useful to be able to reference the cmap."""
-
-    pltmap = plt.get_cmap("tab10")
-
-    plt.rcParams['font.family'] = 'Arial'
-    plt.rcParams['font.size'] = 12
-    plt.rcParams['lines.linewidth'] = 1
-
-    plt.rcParams['axes.linewidth'] = 1
-    plt.rcParams['axes.grid'] = True
-    plt.rcParams['grid.linestyle'] = ':'
-    plt.rcParams['grid.alpha'] = 0.5
-
-    plt.rcParams['legend.framealpha'] = 1
-    plt.rcParams['legend.facecolor'] = 'white'
-    plt.rcParams['legend.edgecolor'] = 'k'
-
-    return pltmap
-
-
-def draw_lines(es, label=None, ls='--', **kwargs):
-    """Draws dashed lines on the current plot axis at the
-    specified x-values (energies).
-
-    Parameters
-    ----------
-    es : list
-        The list of energies at which to draw lines
-
-    kwargs : standard format parameters for plt.plot functions
-
-    """
-
-    if label is not None:
-        plt.plot([], [], label=label, ls=ls, **kwargs)
-
-    for i in range(len(es)):
-        plt.axvline(es[i], label=None, ls=ls, **kwargs)
-
-
-def add_scalebar(scalebarlen, ax, px_mm=1/(80/2048), loc='lower right', **kwargs):
-    """Draw a formatted and labelled scalebar.
-
-    Parameters
-    ----------
-    scalebarlen : float
-        Physical length of scalebar in mm
-
-    ax : plt.axes object
-        Axis on which to draw the scalebar
-
-    px_mm : float
-        Pixels per millimeter for the image space
-
-    """
-    from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
-
-    # default 39.0 um effective pixel size for iQID
-    scalebar = AnchoredSizeBar(ax.transData,
-                               scalebarlen *
-                               px_mm, '{} mm'.format(scalebarlen),
-                               loc=loc,
-                               **kwargs)
-    ax.add_artist(scalebar)
-
-
-def nice_colorbar(mappable, cbar_location="right", orientation="vertical", pad=0.05):
-    """Produce a decently formatted colorbar.
-    Only really works on single image, don't try with subplots."""
-    from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
-
-    last_axes = plt.gca()
-    ax = mappable.axes
-    fig = ax.figure
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes(cbar_location, size="5%", pad=pad)
-    cbar = fig.colorbar(mappable, cax=cax, orientation=orientation)
-    plt.sca(last_axes)
-    return cbar
-
-
-def compare_metrics(ref, mov):
-    """Wrapper function to compare two images in several ways:
-    
-    - Mean and max % difference
-    - Visual comparison with plot_compare()
-    - Pixel intensity histogram comparison with plot_hists()
-    """
-    mean_diff = (np.mean(mov) - np.mean(ref))/np.mean(ref)
-    max_diff = (np.max(mov) - np.max(ref))/np.max(ref)
-    print('Mean % err (compared to image 1): {:.2f} %'.format(mean_diff*100))
-    print('Max % err (compared to image 1): {:.2f} %'.format(max_diff*100))
-    plot_compare(ref, mov)
-    plot_hists(ref, mov)
-
-
-def plot_hists(slice1, slice2):
-    """Compare the pixel intensity histograms between two images."""
-
-    f = plt.figure(figsize=(8, 4))
-    n1, bins1 = np.histogram(slice1.ravel(), density=True, bins=100)
-    n2, bins2 = np.histogram(slice2.ravel(), density=True, bins=100)
-    plt.step(bins1[1:-1], n1[1:], alpha=1, label='reference image')
-    plt.step(bins2[1:-1], n2[1:], alpha=1, label='comparison image')
-    plt.legend()
-    plt.xlabel('Dose rate (mGy/h)')
-    plt.ylabel('Frequency')
-    plt.show()
-
-
-def plot_compare(slice1, slice2):
-    """Nice plotting wrapper to visually compare two images."""
-
-    from mpl_toolkits.axes_grid1 import ImageGrid
-    from matplotlib.colorbar import Colorbar
-
-    fig = plt.figure(figsize=(8, 4))
-    ax = ImageGrid(fig, 111,
-                   nrows_ncols=(1, 2),
-                   axes_pad=0.02,
-                   share_all=True,
-                   cbar_location="right",
-                   cbar_mode="single",
-                   cbar_size="7%",
-                   cbar_pad=0.05,
-                   )
-
-    im1 = ax[0].imshow(slice1, cmap='inferno')  # , vmin=immin, vmax=immax)
-    vmi, vma = im1.get_clim()
-    im2 = ax[1].imshow(slice2, cmap='inferno', vmin=vmi, vmax=vma)
-
-    # Colorbar
-    ax[1].cax.cla()
-    cbar = Colorbar(ax[1].cax, im2)
-    cbar.set_label('Absorbed Dose Rate\n(mGy/h)')
-    ax[0].axis('off')
-    ax[1].axis('off')
-    ax[0].set_title('Reference Image')
-    ax[1].set_title('Comparison Image')
-    plt.show()
-    plt.close()
-
-
-def plot_sequence(imstack, nrows=2, figsize=(18, 10), balance=False):
-    f, ax = plt.subplots(nrows=nrows, ncols=int(
-        np.ceil(len(imstack)/nrows)), figsize=figsize)
-    ax = ax.ravel()
-
-    vma = np.max(imstack)
-    for i in np.arange(0, len(ax)):
-        try:
-            if balance:
-                ax[i].imshow(imstack[i], cmap='gray', vmax=vma)
-            else:
-                ax[i].imshow(imstack[i], cmap='gray')
-
-            ax[i].axis('off')
-            ax[i].text(1, 0, i, fontsize=18, color='white', transform=ax[i].transAxes,
-                       horizontalalignment='right', verticalalignment='bottom')
-        except IndexError:
-            ax[i].axis('off')
-
-    plt.tight_layout()
-    plt.show()
-    plt.close()
+def combine_files(glob_path, dim=1):
+    # import and combine a set of procedurally named txt files
+    # such as AcRa_218s_0.txt, AcRa_218s_1.txt, ...
+    filelist = natural_sort(glob_path)
+    alist = []
+    for i in range(len(filelist)):
+        x = np.loadtxt(filelist[i])
+        alist.append(x)
+        
+    if dim==1:
+        return np.ravel(alist)
+    elif dim > 1:
+        return np.vstack(alist)
+    else:
+        print('select dimension: 1 or greater')
 
 # ---------------------------- DEPRECATED ---------------------------- #
 

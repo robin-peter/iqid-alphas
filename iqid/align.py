@@ -34,7 +34,7 @@ def get_maxdim(fileList):
 
     '''
     temp = np.zeros((len(fileList), 2))
-    for i in range(len(fileList)):
+    for i in trange(len(fileList), desc='Evaluating image sizes...'):
         w, h = imagesize.get(fileList[i])
         temp[i, :] = h, w
 
@@ -43,94 +43,72 @@ def get_maxdim(fileList):
     return (maxh, maxw)
 
 
-def assemble_stack(imdir=None, fformat='tif', pad=False):
-    """Alphabetizes (natural sort) a set of similarly named images into a np stack.
-    For proper alphabetization, files must have the same prefixes, e.g.:
+def assemble_stack(imdir=None, fformat='tif', pad=False, pad_color=(0, 0, 0)):
+    """Natural-sort a directory of images into a numpy stack.
 
-    H700_LN_2hrPI_iQID_01_Activity_Estimate_mBq_2x.tif
-    H700_LN_2hrPI_iQID_02_Activity_Estimate_mBq_2x.tif
-    H700_LN_2hrPI_iQID_03_Activity_Estimate_mBq_2x.tif
-    ...
-    H700_LN_2hrPI_iQID_14_Activity_Estimate_mBq_2x.tif
+    Handles both grayscale (2D) and colour (3D) images automatically.
+    When pad=True, images are centre-padded to the maximum dimensions in the set.
 
     Parameters
     ----------
     imdir : str
-        The name of the directory containing the images
-
+        Directory containing the images.
     fformat : str
-        File extension of the images, default 'tif'.
-
+        File extension, default 'tif'.
     pad : bool
-        True if image files are not the same size and should be padded with zeros to match.
+        Pad images to a common size when they differ in shape.
+    pad_color : tuple of int
+        RGB fill value used when padding colour images (default black).
 
     Returns
     -------
-    imcollection : array-like
-        The concatenated but unregistered stack of images.
+    imcollection : ndarray, shape (N, H, W) or (N, H, W, C)
     """
+    import imageio as iio
 
-    data_path = os.path.join('.', imdir)
-    fileList = glob.glob(os.path.join(data_path, '*.' + fformat))
-    fileList.sort(key=helper.natural_keys)
+    fileList = helper.natural_sort(glob.glob(os.path.join(imdir, '*.' + fformat)))
 
-    if pad:
-        temp = np.zeros((len(fileList), 2))
-        for i in range(len(fileList)):
-            im = io.imread(fileList[i])
-            h, w = im.shape
-            temp[i, :] = h, w
+    if not pad:
+        images = [np.array(iio.imread(f)) for f in fileList]
+        shapes = [im.shape for im in images]
+        if len(set(shapes)) == 1:
+            return np.array(images)
+        # Inhomogeneous shapes — fall through to pad path
+        pad = True
 
-        maxh = int(np.max(temp[:, 0]))
-        maxw = int(np.max(temp[:, 1]))
+    first = np.array(iio.imread(fileList[0]))
+    is_color = first.ndim == 3
+    dims = np.array([np.array(iio.imread(f)).shape[:2] for f in fileList])
+    maxh, maxw = int(dims[:, 0].max()), int(dims[:, 1].max())
 
-        imcollection = np.zeros((len(fileList), maxh, maxw))
-        for i in range(len(fileList)):
-            im = io.imread(fileList[i])
-            h, w = im.shape
-            # use shape and not w/h in case image was on edge and not full value of rectangle
-            padx = maxw - w
-            pady = maxh - h
-            im = cv2.copyMakeBorder(im, int(np.ceil(pady/2)), int(np.floor(pady/2)),
-                                    int(np.ceil(padx/2)), int(np.floor(padx/2)), cv2.BORDER_CONSTANT, value=(0, 0, 0))
-            imcollection[i, :, :] = im
+    if is_color:
+        CHA = first.shape[2]
+        out = np.zeros((len(fileList), maxh, maxw, CHA), dtype=np.uint8)
+        for i, f in enumerate(fileList):
+            im = np.array(iio.imread(f))
+            h, w = im.shape[:2]
+            result = np.full((maxh, maxw, CHA), pad_color, dtype=np.uint8)
+            yc, xc = (maxh - h) // 2, (maxw - w) // 2
+            result[yc:yc+h, xc:xc+w] = im
+            out[i] = result
+        return out.astype(int)
     else:
-        imcollection = io.ImageCollection(fileList)
-        # , dtype=object) # this toggle sometimes fixes/breaks things
-        imcollection = np.array(imcollection)
-
-    return (imcollection)
+        out = np.zeros((len(fileList), maxh, maxw), dtype=first.dtype)
+        for i, f in enumerate(fileList):
+            im = np.array(iio.imread(f))
+            h, w = im.shape
+            padx, pady = maxw - w, maxh - h
+            out[i] = cv2.copyMakeBorder(
+                im,
+                int(np.ceil(pady/2)), int(np.floor(pady/2)),
+                int(np.ceil(padx/2)), int(np.floor(padx/2)),
+                cv2.BORDER_CONSTANT, value=0)
+        return out
 
 
 def assemble_stack_hne(imdir=None, fformat='tif', color=(0, 0, 0), pad=True):
-    data_path = os.path.join('.', imdir)
-    fileList = glob.glob(os.path.join(data_path, '*.' + fformat))
-    fileList.sort(key=iq.natural_keys)
-
-    if pad:
-        temp = np.zeros((len(fileList), 2))
-        for i in range(len(fileList)):
-            im = io.imread(fileList[i])
-            h, w, CHA = im.shape
-            temp[i, :] = h, w
-
-        maxh = int(np.max(temp[:, 0]))
-        maxw = int(np.max(temp[:, 1]))
-
-        imcollection = np.zeros((len(fileList), maxh, maxw, CHA))
-        for i in range(len(fileList)):
-            im = io.imread(fileList[i])
-            h, w, _ = im.shape
-            result = np.full((maxh, maxw, CHA), color, dtype=np.uint8)
-            x_center = (maxw - w) // 2
-            y_center = (maxh - h) // 2
-            result[y_center:y_center+h, x_center:x_center+w, :] = im
-            imcollection[i, :, :] = result
-    else:
-        imcollection = io.ImageCollection(fileList)
-        imcollection = np.array(imcollection)
-
-    return (imcollection.astype(int))
+    """Backward-compatible wrapper — use assemble_stack instead."""
+    return assemble_stack(imdir, fformat=fformat, pad=pad, pad_color=color)
 
 
 def pad_stack_he(data_path, fformat='png', color=(0, 0, 0), savedir=None, verbose=False):
@@ -177,49 +155,30 @@ def pad_stack_he(data_path, fformat='png', color=(0, 0, 0), savedir=None, verbos
                 newdir, '{}_pad.'.format(imname) + fformat), result)
 
 
-def organize_onedir(imdir=None, include_idx=[], order_idx=[], fformat='png'):
-    nameDict = {'full_masks': 'mask',
-                'mBq_images': 'mBq',
-                'ROI_masks': 'mask'}
+def preprocess_topdir(topdir, include_idx=None, order_idx=None,
+                      delete=True, rename=True, new_name=None):
+    """Delete excluded images and rename kept images across all export subdirectories.
 
-    fileList = glob.glob(os.path.join(imdir, '*.' + fformat))
-    fileList.sort(key=helper.natural_keys)
-
-    # error checking for input indices
-    if len(include_idx) == 0:
-        include_idx = np.ones(len(fileList))
-    if len(order_idx) == 0:
-        order_idx = np.arange(len(fileList))
-
-    err_1 = "Inclusion index length doesn't match saved images."
-    err_2 = "Order index length doesn't match inclusion indices."
-    assert len(include_idx) == len(fileList), err_1
-    assert len(order_idx) == sum(include_idx), err_2
-
-    usr_yn = helper.get_yn(input('Delete images in-place?'))
-    if usr_yn:
-        del_list = np.array(fileList)[np.logical_not(include_idx).astype(bool)]
-        for f in del_list:
-            os.remove(f)
-
-    usr_yn = helper.get_yn(input('Rename images in-place?'))
-    if usr_yn:
-        fileList = glob.glob(onepath + '\*.' + fformat)
-        prefix = os.path.dirname(fileList[0])
-        for i in range(len(fileList)):
-            newname = os.path.join(prefix, nameDict[os.path.basename(
-                prefix)] + '_{}.{}'.format(order_idx[i], fformat))
-            os.rename(fileList[i], newname)
-
-
-def preprocess_topdir(topdir, include_idx=[], order_idx=[]):
-    # rewrite function to just do one prompt for all three folderrs
-    # then prompt to move to subdirectory under Mouse 1 kidney 1st
+    Parameters
+    ----------
+    topdir : str
+        Top-level export directory produced by iQData.fitROIs (contains
+        subdirs like mBq_images/, full_masks/, etc.).
+    include_idx : array of 0/1, optional
+        One entry per exported image; 0 = exclude. Defaults to keeping all.
+    order_idx : array of int, optional
+        New sequential indices for the kept images. Defaults to existing order.
+    delete : bool
+        If True, remove files where include_idx == 0.
+    rename : bool
+        If True, rename kept files to canonical <prefix>_<n>.<ext> names.
+    new_name : str, optional
+        If given, rename topdir to this name inside its parent directory.
+    """
     nameDict = {'full_masks': 'mask',
                 'mBq_images': 'mBq',
                 'mBq_image_previews': 'mBq_preview',
                 'ROI_masks': 'mask'}
-
     fformatDict = {'full_masks': 'png',
                    'mBq_images': 'tif',
                    'mBq_image_previews': 'png',
@@ -227,58 +186,52 @@ def preprocess_topdir(topdir, include_idx=[], order_idx=[]):
 
     subdirs = helper.list_studies(topdir)
 
-    usr_yn = helper.get_yn(input('Delete images in-place?'))
-    if usr_yn:
-        for i in range(len(subdirs)):
-            subdir = subdirs[i]
-            try:
-                fformat = fformatDict[os.path.basename(subdir)]
-            except KeyError:
+    # resolve defaults against the first recognised subdir
+    if include_idx is None or order_idx is None:
+        for subdir in subdirs:
+            fformat = fformatDict.get(os.path.basename(subdir))
+            if fformat is None:
                 continue
-            fileList = glob.glob(os.path.join(subdir, '*.' + fformat))
-            fileList.sort(key=helper.natural_keys)
-            assert len(include_idx) == len(
-                fileList), "Inclusion index length ({}) doesn't match saved images ({}).".format(
-                    len(include_idx), len(fileList)
-            )
-            del_list = np.array(fileList)[
-                np.logical_not(include_idx).astype(bool)]
-            for f in del_list:
+            fileList = helper.natural_sort(glob.glob(os.path.join(subdir, '*.' + fformat)))
+            n = len(fileList)
+            if include_idx is None:
+                include_idx = np.ones(n, dtype=int)
+            if order_idx is None:
+                order_idx = np.arange(int(np.sum(include_idx)))
+            break
+
+    include_idx = np.asarray(include_idx)
+    order_idx = np.asarray(order_idx)
+
+    for subdir in subdirs:
+        fformat = fformatDict.get(os.path.basename(subdir))
+        if fformat is None:
+            continue
+        fileList = helper.natural_sort(glob.glob(os.path.join(subdir, '*.' + fformat)))
+
+        assert len(include_idx) == len(fileList), (
+            "Inclusion index length ({}) doesn't match saved images ({}).".format(
+                len(include_idx), len(fileList)))
+        assert len(order_idx) == int(np.sum(include_idx)), (
+            "Order index length doesn't match inclusion indices.")
+
+        if delete:
+            for f in np.array(fileList)[include_idx == 0]:
                 os.remove(f)
 
-    usr_yn = helper.get_yn(input('Rename images in-place?'))
-    if usr_yn:
-        for i in range(len(subdirs)):
-            subdir = subdirs[i]
-            try:
-                fformat = fformatDict[os.path.basename(subdir)]
-            except KeyError:
-                continue
-            fileList = glob.glob(os.path.join(subdir, '*.' + fformat))
-            fileList.sort(key=helper.natural_keys)
+        if rename:
+            kept = helper.natural_sort(glob.glob(os.path.join(subdir, '*.' + fformat)))
+            prefix = nameDict[os.path.basename(subdir)]
+            # first pass: rename to temp names to avoid collisions
+            for j, f in enumerate(kept):
+                os.rename(f, os.path.join(subdir, 'temp_{}.{}'.format(j, fformat)))
+            # second pass: apply canonical names in order
+            temps = helper.natural_sort(glob.glob(os.path.join(subdir, 'temp_*.' + fformat)))
+            for j, f in enumerate(temps):
+                os.rename(f, os.path.join(subdir, '{}_{}.{}'.format(prefix, order_idx[j], fformat)))
 
-            assert len(order_idx) == sum(
-                include_idx), "Order index length doesn't match inclusion indices."
-
-            # rename all arbitrarily to circumvent permissions and duplicates problem
-            for j in range(len(fileList)):
-                tempname = os.path.join(
-                    subdir, 'temp_{}.{}'.format(j, fformat))
-                os.rename(fileList[j], tempname)
-
-            # reimport and sort appropriately
-            fileList = glob.glob(os.path.join(subdir, '*.' + fformat))
-            fileList.sort(key=helper.natural_keys)
-            for j in range(len(fileList)):
-                newname = os.path.join(subdir, nameDict[os.path.basename(
-                    subdir)] + '_{}.{}'.format(order_idx[j], fformat))
-                os.rename(fileList[j], newname)
-
-    usr_yn = helper.get_yn(input('Rename as new subdirectory?'))
-    if usr_yn:
-        name = input('New folder name:')
-        newname = os.path.join(os.path.dirname(topdir), name)
-        os.rename(topdir, newname)
+    if new_name is not None:
+        os.rename(topdir, os.path.join(os.path.dirname(topdir), new_name))
 
 
 def ignore_images(data, exclude_list, pad='backwards'):
@@ -485,100 +438,65 @@ def mask_from_contour(img, snake):
     return (newmask)
 
 
+def pad_to(im, x_, y_, fill=0):
+    """Centre-pad im to shape (y_, x_), handling 2D and 3D (colour) arrays.
+
+    Parameters
+    ----------
+    im : ndarray
+        Image to pad. May be 2D (H, W) or 3D (H, W, C).
+    x_, y_ : int
+        Target width and height.
+    fill : scalar
+        Constant fill value (default 0). Use 255 for white H&E backgrounds.
+
+    Returns
+    -------
+    ndarray of shape (y_, x_) or (y_, x_, C)
+    """
+    y, x = im.shape[:2]
+    y_pad, x_pad = y_ - y, x_ - x
+    pad_width = [(y_pad//2, y_pad//2 + y_pad % 2),
+                 (x_pad//2, x_pad//2 + x_pad % 2)]
+    if im.ndim == 3:
+        pad_width.append((0, 0))
+    return np.pad(im, pad_width, mode='constant', constant_values=fill)
+
+
+def pad_to_common(im1, im2, fill=0):
+    """Pad two images to the maximum dimensions of each other.
+
+    Handles any combination of 2D and 3D arrays.
+
+    Returns
+    -------
+    im1_padded, im2_padded : ndarrays at common (max_h, max_w[, C]) shape
+    """
+    newy = max(im1.shape[0], im2.shape[0])
+    newx = max(im1.shape[1], im2.shape[1])
+    return pad_to(im1, newx, newy, fill), pad_to(im2, newx, newy, fill)
+
+
+# ── Backward-compatible aliases ────────────────────────────────────────────────
+
 def to_shape(mov, x_, y_, vals=(0, 0)):
-    # from https://stackoverflow.com/questions/56357039/numpy-zero-padding-to-match-a-certain-shape
-    """One-pads an image to a certain shape (x_, y_).
-
-    Parameters
-    ----------
-    mov : 2D array-like
-        Image to be padded.
-
-    x_, y_ : 1D array-like
-        The x and y dimensions to which to pad.
-
-    Returns
-    -------
-    2D padded image of dimension (x_, y_)
-    """
-
-    y, x = np.shape(mov)
-
-    y_pad = y_-y
-    x_pad = x_-x
-    return np.pad(mov, ((y_pad//2, y_pad//2 + y_pad % 2),
-                        (x_pad//2, x_pad//2 + x_pad % 2)),
-                  mode='constant', constant_values=vals)
-
-
-def pad_2d_masks(movmask, refmask, func=to_shape):
-    """Detects the larger dimensions between two images and pads them both to them.
-
-    Parameters
-    ----------
-    movmask : 2D array-like
-        Binary mask of the "moving" image (iQID dose-rate).
-
-    refmask : 2D array-like
-        Binary mask of the "reference" image (H&E stain).
-
-    Returns
-    -------
-    movpad : 2D array-like
-        Padded binary mask of the "moving" image (iQID dose-rate).
-
-    refpad : 2D array-like
-        Padded binary mask of the "reference" image (H&E stain).
-    """
-    y, x = np.shape(movmask)
-    y_, x_ = np.shape(refmask)
-
-    newy = max(y, y_)
-    newx = max(x, x_)
-
-    movpad = func(movmask, newx, newy)
-    refpad = func(refmask, newx, newy)
-
-    return (movpad, refpad)
+    return pad_to(mov, x_, y_, fill=vals[0] if hasattr(vals, '__len__') else vals)
 
 
 def to_shape_rgb(mov, x_, y_):
-    """Same function as to_shape but for RGB images (instead of binary).
-    Useful when trying to overlay contours or pad the H&E stain."""
-    y, x, _ = np.shape(mov)
-
-    y_pad = y_-y
-    x_pad = x_-x
-    return np.pad(mov,
-                  ((y_pad//2, y_pad//2 + y_pad % 2),
-                   (x_pad//2, x_pad//2 + x_pad % 2),
-                   (0, 0)),
-                  mode='constant', constant_values=(255, 255))
-
-
-def pad_rgb_im(im_2d, im_rgb):
-    """Same function as pad_2d_masks but where one image is RGB 
-    and the other is grayscale/binary.
-    Useful when trying to overlay contours or pad the H&E stain."""
-    y, x = np.shape(im_2d)
-    y_, x_, _ = np.shape(im_rgb)
-
-    newy = max(y, y_)
-    newx = max(x, x_)
-
-    movpad = to_shape(im_2d, newx, newy)
-    refpad = to_shape_rgb(im_rgb, newx, newy)
-
-    return (movpad, refpad)
+    return pad_to(mov, x_, y_, fill=255)
 
 
 def to_shape_center(im, x_, y_):
-    h, w = im.shape
-    result = np.full((y_, x_), 0, dtype=type(im[0, 0]))
-    x_center = (x_ - w) // 2
-    y_center = (y_ - h) // 2
-    result[y_center:y_center+h, x_center:x_center+w] = im
-    return result
+    return pad_to(im, x_, y_, fill=0)
+
+
+def pad_2d_masks(movmask, refmask, func=None):
+    return pad_to_common(movmask, refmask)
+
+
+def pad_rgb_im(im_2d, im_rgb):
+    return pad_to_common(im_2d, im_rgb)
 
 
 def crop_down(rgb_overlay, rgb_ref, axis='both'):
@@ -660,22 +578,11 @@ def save_imbatch(imstack, newdir, prefix, fformat='tif'):
 
 
 def concatenate_dsets(astack_1, astack_2):
-    # pick larger one to pad up to
-    xx = max(astack_1.shape[1], astack_2.shape[1])
-    yy = max(astack_1.shape[2], astack_2.shape[2])
-
-    new_a1 = np.zeros((len(astack_1), xx, yy))
-    new_a2 = np.zeros((len(astack_2), xx, yy))
-
-    for i in range(len(astack_1)):
-        new_a1[i], _ = pad_2d_masks(
-            astack_1[i], astack_2[0], func=to_shape)
-
-    for i in range(len(astack_2)):
-        new_a2[i], _ = pad_2d_masks(
-            astack_2[i], astack_1[0], func=to_shape)
-    astack_mBq = np.concatenate((new_a1, new_a2))
-    return (astack_mBq)
+    maxh = max(astack_1.shape[1], astack_2.shape[1])
+    maxw = max(astack_1.shape[2], astack_2.shape[2])
+    new_a1 = np.stack([pad_to(astack_1[i], maxw, maxh) for i in range(len(astack_1))])
+    new_a2 = np.stack([pad_to(astack_2[i], maxw, maxh) for i in range(len(astack_2))])
+    return np.concatenate((new_a1, new_a2))
 
 
 def quantify_err(imstack, reg, tmat, vis=True):
@@ -756,7 +663,7 @@ def recenter_im(im):
                min(non_empty_columns), max(non_empty_columns))
     image_data_new = im[cropBox[0]:cropBox[1]+1, cropBox[2]:cropBox[3]+1]
     x, y = np.shape(im)
-    im_padded = to_shape(image_data_new, y, x)
+    im_padded = pad_to(image_data_new, y, x)
     return (im_padded)
 
 
@@ -774,17 +681,26 @@ def shape_colorise(dr, ref, cmap=plt.cm.inferno):
     dr = cmap(norm(dr))[:, :, :3]
     x_, y_, _ = np.shape(ref)
     dr = crop_down(dr, ref, axis='both')
-    dr = to_shape_rgb(dr, y_, x_)
+    dr = pad_to(dr, y_, x_, fill=255)
     dr = (dr * 255).astype(np.uint8)
     return dr
 
 
-def do_transform(mov, fac, deg, tf):
+def do_transform(mov, fac, deg, tf=None):
+    """Rescale, rotate, and optionally warp a moving image.
+
+    Parameters
+    ----------
+    mov : 2D array
+    fac : float — rescale factor
+    deg : float — rotation angle in degrees
+    tf : ndarray, optional warp matrix; skipped when None
+    """
     out = transform.rescale(mov, fac)
     out = transform.rotate(out, deg)
-    out = transform.warp(out, tf)
-    out = np.round(out.clip(min=0))
-    return out
+    if tf is not None:
+        out = transform.warp(out, tf)
+    return np.round(out.clip(min=0))
 
 
 def rescale_tmat(tmat, s):
@@ -805,38 +721,23 @@ def tmat_3to2(tmat):
     return tmat_2d
 
 
-def do_transform_noscale(mov, ref, deg, tf):
+def do_transform_noscale(mov, ref, deg, tf=None):
+    """Rotate and optionally warp a moving image, then recenter and crop to ref.
+
+    Parameters
+    ----------
+    mov : 2D array — moving image
+    ref : 2D array — reference image (used only for output shape)
+    deg : float — rotation angle in degrees
+    tf : ndarray, optional — PSR warp matrix; skipped when None (coarse rotation only)
+    """
     out = transform.rotate(mov, deg, order=0, preserve_range=True)
-    out = transform.warp(out, tf, order=0, preserve_range=True)
+    if tf is not None:
+        out = transform.warp(out, tf, order=0, preserve_range=True)
     out = out.clip(min=0)
     out = recenter_im(out)
     out = crop_to(out, ref.shape[1], ref.shape[0])
     return out
-
-
-def do_transform_noPSR(mov, ref, deg):
-    # just coarse rotation and housekeeping
-    out = transform.rotate(mov, deg, order=0, preserve_range=True)
-    out = out.clip(min=0)
-    out = recenter_im(out)
-    out = crop_to(out, ref.shape[1], ref.shape[0])
-    return out
-
-
-def plot_compare(mov, ref, lab1=None, lab2=None, cmap1='inferno', cmap2=False, axis='off'):
-    f, ax = plt.subplots(1, 2, figsize=(10, 5))
-    ax[0].imshow(mov, cmap=cmap1)
-    if cmap2:
-        ax[1].imshow(ref, cmap2)
-    else:
-        ax[1].imshow(ref)
-    ax[0].axis(axis)
-    ax[1].axis(axis)
-    ax[0].set_title(lab1)
-    ax[1].set_title(lab2)
-    plt.tight_layout()
-    plt.show()
-    plt.close()
 
 
 def norm_im(im):
