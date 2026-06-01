@@ -251,7 +251,7 @@ class DataReviewApp:
             if not lm_files:
                 raise FileNotFoundError('No Compressed_Processed_Listmode.dat found.')
 
-            cdat = pc.ClusterData(lm_files[-1], ftype='processed_lm', c_area_thresh=5)
+            cdat = pc.iQData(lm_files[-1], ftype='processed_lm', c_area_thresh=5)
             self.cim = cdat.image_from_big_listmode(event_fx=1)
             self.t_s = cdat.t_s
             self.root.after(0, self._populate_image_tab)
@@ -260,7 +260,7 @@ class DataReviewApp:
                 glob.glob(os.path.join(self.datdir, 'Listmode',
                                        '*Offsets_Full_Raw_Listmode.dat')))
             if off_files:
-                off = pc.ClusterData(off_files[-1], ftype='offset_lm')
+                off = pc.iQData(off_files[-1], ftype='offset_lm')
                 data = off.load_cluster_data(dtype=np.int32)
                 _, t_ms, _, N, _, kelv = off.init_metadata(data)
                 self.t_frame_h  = t_ms / 1e3 / 3600
