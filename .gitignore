@@ -1,4 +1,6 @@
-data_sample
-!.gitkeep
-create_gitkeeps.ipynb
-.ipynb_checkpoints
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.DS_Store
+.ipynb_checkpoints/
